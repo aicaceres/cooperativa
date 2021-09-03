@@ -12,3 +12,6 @@
 /vendor/
 /bin/
 /composer.phar
+
+# Private
+/docs/
