@@ -78,8 +78,7 @@ class VehiculoController extends Controller {
                 $partial = $this->renderView('AdminBundle:Empleado:_partial_list.html.twig',
                         array('entity' => $entity->getSocio())
                 );
-                $msg = 'OK';
-                //$tr = $this->setTableTr($entity);
+                $msg = 'OK';                
             }
             catch (\Exception $ex) {
                 $msg = $ex->getMessage();
@@ -115,8 +114,7 @@ class VehiculoController extends Controller {
                 $partial = $this->renderView('AdminBundle:Empleado:_partial_list.html.twig',
                         array('entity' => $entity->getSocio())
                 );
-                $msg = 'OK';
-                //$tr = $this->setTableTr($entity);
+                $msg = 'OK';                
             }
             catch (\Exception $ex) {
                 $msg = $ex->getMessage();

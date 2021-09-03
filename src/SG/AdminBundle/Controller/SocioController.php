@@ -239,22 +239,12 @@ class SocioController extends Controller {
         if (!$entity) {
             throw $this->createNotFoundException('No existe el Socio.');
         }
-        /* $originalDomLab = new ArrayCollection();
-          foreach ($entity->getDomicilios() as $item) {
-          $originalDomLab->add($item);
-          } */
 
         $deleteForm = $this->createDeleteForm($id);
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
 
-        if ($editForm->isValid()) {
-            // remove the relationship
-            /* foreach ($originalDomLab as $item) {
-              if (false === $entity->getDomicilios()->contains($item)) {
-              $em->remove($item);
-              }
-              } */
+        if ($editForm->isValid()) {            
             $em->flush();
             return $this->redirect($this->generateUrl('socio_abm'));
         }
@@ -268,8 +258,8 @@ class SocioController extends Controller {
 
     /* Suggest */
 
-    public function getSocioSuggestAction() {
-        $term = $this->getRequest()->get('term');
+    public function getSocioSuggestAction(Request $request) {
+        $term = $request->get('term');
         $em = $this->getDoctrine()->getManager();
         $items = $em->getRepository('AdminBundle:Socio')->findAllByTerm($term);
         $array = array();
@@ -309,10 +299,10 @@ class SocioController extends Controller {
             'Content-Disposition' => 'filename=ListadoSocios.pdf'));
     }
 
-    public function mailingAction() {
-        $asunto = $this->getRequest()->get('asunto');
-        $titulo = $this->getRequest()->get('titulo');
-        $mensaje = $this->getRequest()->get('mensaje');
+    public function mailingAction(Request $request) {
+        $asunto = $request->get('asunto');
+        $titulo = $request->get('titulo');
+        $mensaje = $request->get('mensaje');
 
         $em = $this->getDoctrine()->getManager();
         $socios = $em->getRepository('AdminBundle:Socio')->findAll();
@@ -342,20 +332,20 @@ class SocioController extends Controller {
         ));
     }
 
-    public function sendMailingAction() {
-        $mails = $this->getRequest()->get('mails');
-        $asunto = $this->getRequest()->get('asunto');
-        $mensaje = $this->getRequest()->get('mensaje');
+    public function sendMailingAction(Request $request) {
+        $mails = $request->get('mails');
+        $asunto = $request->get('asunto');
+        $mensaje = $request->get('mensaje');
 
         $em = $this->getDoctrine()->getManager();
-        $cabecera = 'http://diwebmisiones.com.ar/cofomi/membrete.png';
+        $cabecera = './membrete.png';
 
         foreach ($mails as $socioId) {
             $socio = $em->getRepository('AdminBundle:Socio')->find($socioId);
             if (filter_var($socio->getEmail(), FILTER_VALIDATE_EMAIL)) {
                 $message = \Swift_Message::newInstance()
                         ->setSubject($asunto)
-                        ->setFrom('notificaciones@cofomi.com.ar')
+                        ->setFrom('notificaciones@mail.com.ar')
                         ->setTo($socio->getEmail());
                 $message->setBody(
                         $this->renderView('ConfigBundle:Mails:mail.html.twig', array(
@@ -384,34 +374,12 @@ class SocioController extends Controller {
         return $this->render('AdminBundle:Socio:liquidacion.html.twig', array('socio' => $socio));
     }
 
-    public function getDatosLiquidacionesAction() {
-        $id = $this->getRequest()->get('socioId');
+    public function getDatosLiquidacionesAction(Request $request) {
+        $id = $request->get('socioId');
         $em = $this->getDoctrine()->getManager();
         $socio = $em->getRepository('AdminBundle:Socio')->find($id);
         $liquidaciones = $em->getRepository('AdminBundle:Caja')->getLiquidacionesBySocio($id);
         $partial = $this->renderView('AdminBundle:Socio:_liquidaciones_list.html.twig', array('liquidaciones' => $liquidaciones,));
-        return new Response(json_encode($partial));
-
-
-        $hoy = new \DateTime(date('d-m-Y'));
-        $deleteForms = array();
-
-        foreach ($socio->getDeudas() as $deuda) {
-            $deleteForms[$deuda->getId()] = $this->createDeleteDeudaForm($deuda->getId())->createView();
-            if (count($deuda->getPagos()) == 0 && $deuda->getFechaVto() < $hoy) {
-                $dias = UtilsController::diasTranscurridos($deuda->getFechaVto()->format('Y-m-d'), date('Y-m-d'));
-                //calcular mora
-                if ($param->getTipoRecargoCuota() == 'P') {
-                    $recargo = ($deuda->getMonto() * ($param->getMontoRecargoCuota() / 100)) * $dias;
-                }
-                else {
-                    $recargo = $param->getMontoRecargoCuota() * $dias;
-                }
-                $deuda->setMora($recargo);
-            }
-        }
-
-        $partial = $this->renderView('AdminBundle:Socio:_partial_datosCtaCte.html.twig', array('socio' => $socio, 'deleteForms' => $deleteForms, 'vencido' => $vencido));
         return new Response(json_encode($partial));
     }
 
@@ -420,7 +388,7 @@ class SocioController extends Controller {
      */
 
     public function informePorEmpresaAction($id) {
-
+        //
     }
 
     public function importAction() {

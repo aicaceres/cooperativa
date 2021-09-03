@@ -1,7 +1,6 @@
 <?php
 
 namespace SG\AdminBundle\Controller;
-#use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -25,39 +24,26 @@ class DeudaController extends Controller {
         return $this->render('AdminBundle:Socio:ctacte.html.twig', array('socio' => $socio));
     }
 
-    public function getDatosCtaCteAction() {
-        $id = $this->getRequest()->get('socioId');
-        $vencido = $this->getRequest()->get('estado');
-        $em = $this->getDoctrine()->getManager();
-        //$param = $em->getRepository('ConfigBundle:Configuracion')->find(1);
-        $socio = $em->getRepository('AdminBundle:Socio')->find($id);
-        //$hoy = new \DateTime(date('d-m-Y'));
+    public function getDatosCtaCteAction(Request $request) {
+        $id = $request->get('socioId');
+        $vencido = $request->get('estado');
+        $em = $this->getDoctrine()->getManager();        
+        $socio = $em->getRepository('AdminBundle:Socio')->find($id);        
         $deleteForms = array();
 
         foreach ($socio->getDeudas() as $deuda) {
             $deleteForms[$deuda->getId()] = $this->createDeleteDeudaForm($deuda->getId())->createView();
-            $deuda->setMora($this->getMora($deuda));
-            /* if ($deuda->getFechaVto() < $hoy) {
-              $dias = UtilsController::diasTranscurridos($deuda->getFechaVto()->format('Y-m-d'), date('Y-m-d'));
-              //calcular mora
-              if ($param->getTipoRecargoCuota() == 'P') {
-              $recargo = ($deuda->getSaldo() * ($param->getMontoRecargoCuota() / 100)) * $dias;
-              }
-              else {
-              $recargo = $param->getMontoRecargoCuota() * $dias;
-              }
-              $deuda->setMora($recargo);
-              } */
+            $deuda->setMora($this->getMora($deuda));            
         }
 
         $partial = $this->renderView('AdminBundle:Socio:_partial_datosCtaCte.html.twig', array('socio' => $socio, 'deleteForms' => $deleteForms, 'vencido' => $vencido));
         return new Response(json_encode($partial));
     }
 
-    public function newDeudaAction() {
-        $tipo = $this->getRequest()->get('tipo');
+    public function newDeudaAction(Request $request) {
+        $tipo = $request->get('tipo');
         $em = $this->getDoctrine()->getManager();
-        $socio = $em->getRepository('AdminBundle:Socio')->find($this->getRequest()->get('socioId'));
+        $socio = $em->getRepository('AdminBundle:Socio')->find($request->get('socioId'));
         $parametros = $em->getRepository('ConfigBundle:Configuracion')->find(1);
         $fechaVto = strtotime($parametros->getDiaVtoCuota() . '-' . date('m-Y'));
         $entity = new Deuda();
@@ -67,10 +53,7 @@ class DeudaController extends Controller {
         if ($tipo == "deuda") {
             $form = $this->createCreateDeudaForm($entity);
         }
-        else {
-            /* $concepto = $em->getRepository('ConfigBundle:ConceptoCaja')->findOneByDeSistema(1);
-              $entity->setConcepto($concepto);
-              $entity->setMonto($concepto->getMonto()); */
+        else {            
             $form = $this->createCreateCuotaForm($entity);
             $form->get('cantidadCuotas')->setData('1');
         }
@@ -195,30 +178,15 @@ class DeudaController extends Controller {
         }
 
         return new Response($msg);
-        //return $this->redirect($this->generateUrl('socio_ctacte'));
     }
 
-    public function getDeudaAction() {
-        $socioId = $this->getRequest()->get('socioId');
-        $tipo = $this->getRequest()->get('tipo');
+    public function getDeudaAction(Request $request) {
+        $socioId = $request->get('socioId');
+        $tipo = $request->get('tipo');
         $em = $this->getDoctrine()->getManager();
-        $socio = $em->getRepository('AdminBundle:Socio')->find($socioId);
-        //$param = $em->getRepository('ConfigBundle:Configuracion')->find(1);
-        //$hoy = new \DateTime(date('d-m-Y'));
+        $socio = $em->getRepository('AdminBundle:Socio')->find($socioId);       
         foreach ($socio->getListaDeudas() as $deuda) {
-            $deuda->setMora($this->getMora($deuda));
-
-            /* if ($deuda->getFechaVto() < $hoy) {
-              $dias = UtilsController::diasTranscurridos($deuda->getFechaVto()->format('Y-m-d'), date('Y-m-d'));
-              //calcular mora
-              if ($param->getTipoRecargoCuota() == 'P') {
-              $recargo = ($deuda->getSaldo() * ($param->getMontoRecargoCuota() / 100)) * $dias;
-              }
-              else {
-              $recargo = $param->getMontoRecargoCuota() * $dias;
-              }
-              $deuda->setMora($recargo);
-              } */
+            $deuda->setMora($this->getMora($deuda));            
         }
         if ($tipo == 'L') {
             $partial = $this->renderView('AdminBundle:Socio:_partial_socio_liqdeuda.html.twig', array('socio' => $socio));
@@ -233,22 +201,9 @@ class DeudaController extends Controller {
         $em = $this->getDoctrine()->getManager();
         $socio = $em->getRepository('AdminBundle:Socio')->find($id);
         $vencido = $request->get('estado');
-
-        //$param = $em->getRepository('ConfigBundle:Configuracion')->find(1);
-        //$hoy = new \DateTime(date('d-m-Y'));
+        
         foreach ($socio->getDeudas() as $deuda) {
-            $deuda->setMora($this->getMora($deuda));
-            /* if (count($deuda->getPagos()) == 0 && $deuda->getFechaVto() < $hoy) {
-              $dias = UtilsController::diasTranscurridos($deuda->getFechaVto()->format('Y-m-d'), date('Y-m-d'));
-              //calcular mora
-              if ($param->getTipoRecargoCuota() == 'P') {
-              $recargo = ($deuda->getMonto() * ($param->getMontoRecargoCuota() / 100)) * $dias;
-              }
-              else {
-              $recargo = $param->getMontoRecargoCuota() * $dias;
-              }
-              $deuda->setMora($recargo);
-              } */
+            $deuda->setMora($this->getMora($deuda));            
         }
         $logo = __DIR__ . '/../../../../web/assets/img/logos/membrete.png';
 
@@ -266,27 +221,14 @@ class DeudaController extends Controller {
 
     public function exportEstadoDeudaAction(Request $request, $id) {
         $em = $this->getDoctrine()->getManager();
-        $socio = $em->getRepository('AdminBundle:Socio')->find($id);
-        //$param = $em->getRepository('ConfigBundle:Configuracion')->find(1);
-        $vencido = $request->get('estado');
-        //$hoy = new \DateTime(date('d-m-Y'));
+        $socio = $em->getRepository('AdminBundle:Socio')->find($id);        
+        $vencido = $request->get('estado');        
         foreach ($socio->getDeudas() as $deuda) {
-            $deuda->setMora($this->getMora($deuda));
-            /* if (count($deuda->getPagos()) == 0 && $deuda->getFechaVto() < $hoy) {
-              $dias = UtilsController::diasTranscurridos($deuda->getFechaVto()->format('Y-m-d'), date('Y-m-d'));
-              //calcular mora
-              if ($param->getTipoRecargoCuota() == 'P') {
-              $recargo = ($deuda->getMonto() * ($param->getMontoRecargoCuota() / 100)) * $dias;
-              }
-              else {
-              $recargo = $param->getMontoRecargoCuota() * $dias;
-              }
-              $deuda->setMora($recargo);
-              } */
+            $deuda->setMora($this->getMora($deuda));            
         }
         $partial = $this->renderView('AdminBundle:Socio:estado-deuda-xls.html.twig',
                 array('socio' => $socio, 'vencido' => $vencido));
-
+        $hoy = new \DateTime(date('d-m-Y'));
         $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $socio->getNombreCompleto())));
         $fileName = 'Estado_Deuda_' . $slug . '_' . $hoy->format('dmY_Hi');
         $response = new Response();
@@ -295,8 +237,6 @@ class DeudaController extends Controller {
         $response->headers->set('Content-Disposition', 'filename="' . $fileName . '.xls"');
         $response->setContent($partial);
         return $response;
-
-
 
         $logo = __DIR__ . '/../../../../web/assets/img/logos/membrete.png';
 

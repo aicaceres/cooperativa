@@ -139,10 +139,7 @@ class CajaController extends Controller {
     }
 
     public function cierreAction($id) {
-        $em = $this->getDoctrine()->getManager();
-        //  $user = $em->getRepository('ConfigBundle:Usuario')->find($this->get('security.context')->getToken()->getUser()->getId());
-        //$caja = $em->getRepository('AdminBundle:Caja')->find($id);
-        //    if($user->getCaja()->getId()==$id){
+        $em = $this->getDoctrine()->getManager();        
         $apertura = $em->getRepository('AdminBundle:Caja')->findAperturaCaja($id);
         if ($apertura) {
             $apertura->setFechaCierre(new \DateTime);
@@ -158,10 +155,7 @@ class CajaController extends Controller {
         }
         else {
             $this->get('session')->getFlashBag()->add('danger', 'No se realizó el cierre');
-        }
-        /*   }else{
-          $this->get('session')->getFlashBag()->add('danger','No posee esta caja asignada!' );
-          } */
+        }       
         return $this->redirect($this->generateUrl('caja_aperturacierre'));
     }
 
@@ -363,21 +357,6 @@ class CajaController extends Controller {
                         $deuda = $em->getRepository('AdminBundle:Deuda')->find($item->getDeuda()->getId());
                         // calcular si se esta pagando mora.
                         $deuda->setMora(DeudaController::getMontoMora($deuda));
-
-                        /* $param = $em->getRepository('ConfigBundle:Configuracion')->find(1);
-                          $hoy = new \DateTime(date('d-m-Y'));
-                          if ($deuda->getFechaVto() < $hoy) {
-                          $dias = UtilsController::diasTranscurridos($deuda->getFechaVto()->format('Y-m-d'), date('Y-m-d'));
-                          //calcular mora
-                          if ($param->getTipoRecargoCuota() == 'P') {
-                          $recargo = ($deuda->getSaldo() * ($param->getMontoRecargoCuota() / 100)) * $dias;
-                          }
-                          else {
-                          $recargo = $param->getMontoRecargoCuota() * $dias;
-                          }
-                          $deuda->setMora($recargo);
-                          } */
-
                         // generar el pago
                         $pago = new Pago();
                         $pago->setDeuda($deuda);
