@@ -1,0 +1,9 @@
+<tr class="data-{{ empleado.id }}" data-id="{{ empleado.id }}">
+    <td>{{ empleado.nombreCompleto }}</td>
+    <td>{{ empleado.nroDocumento }}</td>
+    <td>{{ empleado.cuit }}</td>
+    <td>{{ empleado.telefonos }}</td>
+    <td class="link-actions">
+        {% include "AdminBundle:Empleado:_partial_linkactions.html.twig" with {'id':empleado.id, 'vehiculos':empleado.vehiculos } %}
+    </td>
+</tr>

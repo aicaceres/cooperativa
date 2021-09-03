@@ -1,0 +1,62 @@
+<?php
+namespace SG\AdminBundle\Entity;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
+/**
+ * SG\AdminBundle\Entity\Contacto
+ * @ORM\Table(name="contacto")
+ * @ORM\Entity()
+ */
+class Contacto
+{
+    /**
+     * @var integer $id
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    protected $id;
+    /**
+     * @var string $dato
+     * @ORM\Column(name="dato", type="string", nullable=false)
+     * @Assert\NotBlank()
+     */
+    protected $dato;
+    /**
+     * @var string $horario
+     * @ORM\Column(name="horario", type="string", nullable=true)
+     */
+    protected $horario;
+    /**
+    * @ORM\ManyToOne(targetEntity="SG\ConfigBundle\Entity\TipoContacto")
+    * @ORM\JoinColumn(name="tipo_contacto_id", referencedColumnName="id")
+    */
+    protected $tipoContacto;
+
+    /**
+    * @ORM\ManyToOne(targetEntity="SG\AdminBundle\Entity\Socio", inversedBy="contactos")
+    * @ORM\JoinColumn(name="socio_id", referencedColumnName="id")
+    */
+    protected $contactoSocio;
+
+    /**
+     * @var datetime $created
+     * @Gedmo\Timestampable(on="create")
+     * @ORM\Column(type="datetime")
+     */
+    private $created;
+    /**
+     * @var User $createdBy
+     * @Gedmo\Blameable(on="create")
+     * @ORM\ManyToOne(targetEntity="SG\ConfigBundle\Entity\Usuario")
+     * @ORM\JoinColumn(name="created_by", referencedColumnName="id")
+     */
+    private $createdBy;
+
+    public function __toString() {
+        return $this->dato;
+    }
+
+}

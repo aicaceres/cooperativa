@@ -1,0 +1,84 @@
+{%if 'socio-abm-edit' in app.user.perfil.permisos %}
+     {% set url =  path('socio_abm_edit', { 'id': socio.id }) %}
+{% elseif 'socio-abm-show' in app.user.perfil.permisos  %}
+    {% set url =  path('socio_abm_show', { 'id': socio.id }) %}
+{% endif %}
+<a href="{{ url }}" class="link-socio btn btn-xs btn-info" title="Más Datos del Socio" data-toggle="tooltip"><i class="ion ion-person"></i></a>&nbsp;
+<span><strong>DNI:</strong> {{ socio.nroDocumento }}</span>
+
+<span><strong>Dirección:</strong> {{ socio.direccion }}</span>
+<span><strong>Teléfonos:</strong> {{ socio.telefonos }}</span>
+<span><strong>Localidad:</strong> {{ socio.localidad }}</span>
+<a href="{{ path('export_estado_deuda', { 'id': socio.id, 'estado' : vencido }) }}"  class="pull-right btn btn-default" target="_blank" title="Exportar" data-toggle="tooltip"><i class="fa fa-file-excel-o"></i>&nbsp;&nbsp;Exportar</a>
+<a href="{{ path('print_estado_deuda', { 'id': socio.id, 'estado' : vencido }) }}"  class="pull-right btn btn-default" target="_blank" title="Imprimir" data-toggle="tooltip"><i class="fa fa-print"></i>&nbsp;&nbsp;Imprimir</a>
+<hr>
+
+<div class="table-responsive">
+    <table id="tabledeuda" class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th class="no-sort">#</th>
+                <th class="no-sort">Fecha</th>
+                <th class="no-sort">Concepto</th>
+                <th>Vencimiento</th>
+                <th class="no-sort">Importe</th>
+                <th class="no-sort">Interés</th>
+                <th class="no-sort">Total</th>
+                <th class="no-sort" style="background:#868686;padding:1px;"></th>
+                <th class="no-sort">Pago</th>
+                <th class="no-sort">SALDO</th>
+                <th class="no-sort aligncenter" style="width:8%;"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set importe,interes,total, aux = 0,0,0,0 %}
+            
+            {% for deuda in socio.deudas if deuda.concepto.tipo!='L' %}  
+                {% if (vencido=='true' and deuda.vencido) or vencido=='false'  %}                                                
+                {% set importe,interes,total = importe+deuda.monto , interes+deuda.mora, total+deuda.saldo %}                
+                <tr class="odd gradeX">
+                    <td>{{ loop.index }}</td>
+                    <td>{{ deuda.created|date('d-m-Y') }}</td>
+                    <td>{{ deuda.concepto }} {% if deuda.detalle %} - {% endif %} {{ deuda.detalle }} </td>
+                    <td {% if deuda.vencido %} class="red" {% endif %} > <span class="hidden">{{ deuda.fechaVto|date('Ymd') }}</span>{{ deuda.fechaVto|date('d-m-Y') }}</td>
+                    <td class="alignright">{{ deuda.monto|number_format(2,'.',',') }}</td>
+                    <td class="alignright">{{ deuda.mora|number_format(2,'.',',') }}</td>
+                    <td class="alignright">{{ (deuda.monto+deuda.mora)|number_format(2,'.',',') }}</td>
+                    <td style="background:#868686;padding:1px;"></td>
+                    <td>{%if deuda.ultimoPago %}{{deuda.ultimoPago|date('d-m-Y')}}{% endif %}
+                        <!--<a href="#" data-toggle="tooltip" title="Registrar el Pago"> &nbsp; <i class="fa fa-arrow-right"></i> <i class="fa fa-money"></i></a>-->                        
+                    </td>
+                    <td class="alignright {% if deuda.vencido %} red {% endif %}">
+                        {{deuda.saldo|number_format(2,'.',',')}} 
+                    </td>
+                    <td>
+                        {%if 'socio-ctacte-delete' in app.user.perfil.permisos and deuda.pagos|length ==0 %}
+                        <form action="{{ path('socio_delete_deuda', { 'id': deuda.id }) }}" method="post" class="form-delete-inlist">
+                          
+                            {{ form_widget(deleteForms[deuda.id]) }}
+                            <button type="button" title="Eliminar" class="btn-inlist btn-del-deuda" onclick="if (!confirm('Desea eliminar este Item?')) return false;" data-toggle="tooltip"><i class="fa fa-trash-o"></i></button>
+                        </form>
+                            &nbsp;
+                        {% endif %}
+                         <!-- SHOW -->
+                        <button class="deuda-show-modal btn-inlist" data-url="{{path('deuda_show', {'id':deuda.id, 'mora': deuda.mora })}}" data-idx='{{ loop.index }}' title="Ver detalle" ><i class="fa fa-file-text-o"></i></button>
+
+                    </td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="4"></th>
+                <th class="alignright">{{importe|number_format(2,'.',',')}}</th>
+                <th class="alignright">{{interes|number_format(2,'.',',')}}</th>
+                <th class="alignright">{{(importe+interes)|number_format(2,'.',',')}}</th>
+                <th style="background:#868686;padding:1px;"></th>
+                <th class="alignright">Vencido</th>
+                <th class="alignright {% if socio.saldo>0 %} red {% endif %}">{{socio.saldo|number_format(2,'.',',')}}</th>
+            </tr>
+        </tfoot>
+            
+    </table>
+</div>

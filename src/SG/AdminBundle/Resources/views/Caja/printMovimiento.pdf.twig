@@ -1,0 +1,147 @@
+<pdf>
+    <dynamic-page page-size="A4" margin-left="70px" margin-right="40px" margin-top="30px">
+        <placeholders>
+            <header>
+                <div height="85px" width="100%">
+                    <table>
+                        <tr>
+                            <td border.type="none">
+                               <img ignore-error="true" src="{{logo}}" width="330px" height="70px" margin-bottom="5px"/> 
+                            </td>
+                            <td border.type="none" font-size="7px" text-align="right" vertical-align="bottom" padding-bottom="5px">
+                                <strong>Fecha y hora: </strong>{{'now'|date('d-m-Y H:i')}} 
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div border.color="#D65200" height="2px" ></div>   
+                 </div>                      
+            </header>
+            <footer>
+                <div height="30px" width="100%" text-align="right">
+                    <page-number />
+                </div>
+            </footer>
+        </placeholders>
+        {% set tipo = movimiento.tipo %}
+        <div height="20px"></div>
+        <div font-size="14px" height="20px" vertical-align="top">
+            {% if tipo=='E' %}
+                Egreso de Caja
+            {% elseif tipo=='I' %}
+                Ingreso de Caja
+            {% else %}    
+                Liquidación 
+            {% endif %}    
+            {% if movimiento.socio %}
+                - Socio: {{ movimiento.socio.nombreCompleto|upper }}
+            {% endif %}
+        </div>
+
+        <div height="20px"></div>
+        
+        <table font-size="11px" >
+            <tr>
+                <td border.type="none"><strong>Fecha: </strong>{{movimiento.fecha|date('d-m-Y H:i')}}</td>                
+                <td border.type="none" text-align="right">Usuario: {{movimiento.createdBy}}</td>
+            </tr>
+        </table>
+        <div height="15px"></div>
+        <table font-size="11px" >
+            <tr>
+                <td border.type="none"><strong>Descripción: </strong>{{movimiento.descripcion}}</td>                                
+            </tr>
+        </table>
+            
+        <h3 text-decoration="underline" margin="20px 20px 20px 0px">Detalle:</h3>
+{% if tipo=='E'%}
+    {# MOVIMIENTO DE TIPO EGRESO #}
+    <table font-size="10px">
+        <tr>
+            <td height="20px" vertical-align="middle" text-align="center" font-style="bold" width="0.2 cm">#</td>
+            <td height="20px" vertical-align="middle" text-align="center" font-style="bold" width="5 cm">Concepto</td>
+            <td height="20px" vertical-align="middle" text-align="center" font-style="bold" width="8 cm">Descripción</td>
+            <td height="20px" vertical-align="middle" text-align="center" font-style="bold" width="2 cm" >Importe</td>
+        </tr>
+    {% for det in movimiento.detalles %}                
+        <tr> 
+            <td height="20px" vertical-align="middle" text-align="center" font-style="bold" width="20px">{{ loop.index }}</td> 
+            <td width="70px" padding-left="5px" vertical-align="middle">{{ det.concepto }}</td>
+            <td width="70px" padding-left="5px" vertical-align="middle">{{ det.descripcion }}</td>
+            <td width="70px" text-align="right" vertical-align="middle" padding-right="5px">{{det.importe|number_format(2,'.',',')}}</td>
+        </tr>                     
+    {% endfor %}             
+    </table>           
+{% elseif tipo=='I' %}
+    {# MOVIMIENTO DE TIPO INGRESO #}
+    <table font-size="10px">
+        <tr>
+            <td height="20px" vertical-align="middle" text-align="center" font-style="bold" width="0.5cm">#</td>
+            <td height="20px" vertical-align="middle" text-align="center" font-style="bold" width="4 cm">Concepto</td>
+            <td height="20px" vertical-align="middle" text-align="center" font-style="bold" width="6 cm">Descripción</td>
+            <td height="20px" vertical-align="middle" text-align="center" font-style="bold" width="2 cm" >Importe</td>
+            <td height="20px" vertical-align="middle" text-align="center" font-style="bold" width="2 cm">Pago</td>
+        </tr>
+        {% if movimiento.pagos|length %}
+            {# Si tiene pagos es una deuda de un socio #}
+            {% for pago in movimiento.pagos %}
+                <tr> 
+                    <td height="20px" vertical-align="middle" text-align="center" font-style="bold" width="20px">{{ loop.index }}</td> 
+                    <td width="70px" padding-left="5px" vertical-align="middle">{{ pago.cajaMovimientoDetalle.deuda.deudaTxt }}</td>
+                    <td width="70px" padding-left="5px" vertical-align="middle">{{ pago.descripcion }}</td>
+                    <td width="70px" text-align="right" vertical-align="middle" padding-right="5px">{{pago.cajaMovimientoDetalle.importe|number_format(2,'.',',')}}</td>
+                    <td width="70px" text-align="right" vertical-align="middle" padding-right="5px">{{pago.importe|number_format(2,'.',',')}}</td>
+                </tr> 
+            {% endfor %} 
+        {% else %}
+              {# Sino es un ingreso sin socio relacionado #}
+            {% for det in movimiento.detalles %}
+                <tr>                 
+                    <td height="20px" vertical-align="middle" text-align="center" font-style="bold" width="20px">{{ loop.index }}</td> 
+                    <td width="70px" padding-left="5px" vertical-align="middle">{{ det.concepto }}</td>
+                    <td width="70px" padding-left="5px" vertical-align="middle">{{ det.descripcion }}</td>
+                    <td width="70px" text-align="right" vertical-align="middle" padding-right="5px">{{det.importe|number_format(2,'.',',')}}</td>
+                    <td width="70px" text-align="right" vertical-align="middle" padding-right="5px">{{det.importe|number_format(2,'.',',')}}</td>
+                </tr>                     
+            {% endfor %} 
+        {% endif %}
+    
+            
+    </table> 
+{% else %}
+     {# LIQUIDACION #}   
+     {% set movliq = movimiento.detalleLiquidacion %}          
+     <table font-size="10px">
+        <tr>
+            <td height="20px" vertical-align="middle" text-align="center" font-style="bold" width="0.2cm">#</td>
+            <td height="20px" vertical-align="middle" text-align="center" font-style="bold" width="4 cm">Concepto</td>
+            <td height="20px" vertical-align="middle" text-align="center" font-style="bold" width="9 cm">Descripción</td>
+            <td height="20px" vertical-align="middle" text-align="center" font-style="bold" width="3 cm" >Importe</td>            
+        </tr>         
+        <tr>                 
+            <td background-color="#dddddd" height="20px" vertical-align="middle" text-align="center" font-style="bold" width="20px">1</td> 
+            <td background-color="#dddddd" width="70px" padding-left="5px" vertical-align="middle">{{ movliq.concepto }}</td>
+            <td background-color="#dddddd" width="70px" padding-left="5px" vertical-align="middle">{{ movliq.descripcion }}</td>
+            <td background-color="#dddddd" width="70px" text-align="right" vertical-align="middle" font-style="bold" padding-right="5px">{{movliq.importe|number_format(2,'.',',')}}</td>
+        </tr>          
+        {% for det in movimiento.detalles if det.concepto.tipo != 'L' %}
+        <tr>                 
+            <td height="20px" vertical-align="middle" text-align="center" font-style="bold" width="20px">{{ loop.index + 1}}</td> 
+            <td width="70px" padding-left="5px" vertical-align="middle">{{ det.concepto }}</td>
+            <td width="70px" padding-left="5px" vertical-align="middle">{{ det.descripcion }}</td>
+            <td width="70px" text-align="right" vertical-align="middle" padding-right="5px">-{{det.importe|number_format(2,'.',',')}}</td>
+        </tr>
+        {% endfor %}
+        <tr>                 
+            <td colspan="3" height="20px" vertical-align="middle" text-align="right" padding-right="5px" font-style="bold">PAGO</td> 
+            <td width="70px" text-align="right" vertical-align="middle" font-style="bold" padding-right="5px">{{ (movliq.importe - movimiento.liquidacionImputaciones ) |number_format(2,'.',',')}}</td>
+        </tr> 
+                        
+    </table> 
+     
+     
+     
+{% endif %}
+
+    </dynamic-page>
+</pdf>

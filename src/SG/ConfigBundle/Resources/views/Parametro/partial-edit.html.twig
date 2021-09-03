@@ -1,0 +1,29 @@
+{{ form_start(form,{'attr':{'role':'form'}}) }}
+    {% if entity.id  %}
+        <input name="_method" value="PUT" type="hidden">
+    {%endif%}
+    <div class="row">
+        <div class="col-md-12">
+            <fieldset>
+                <div class="col-md-10">
+                    <div class="form-group">
+                        {{ form_row(form.nombre, { 'attr': {'autofocus':'autofocus', 'class':'form-control' } }) }}
+                    </div>
+                </div>
+            </fieldset>        
+        </div>
+    </div>
+    <input type="hidden" value="{{table}}" name="table"/>
+    <input type="hidden" value="{{path('parametro_create_ajax',{ 'table': table })}}" id="create_url"/>
+           
+    
+    <div style='display:none;'>
+        {{ form_end(form) }}
+    </div>
+</form>   
+<script type="text/javascript">
+$(document).ready(function() {    
+     
+    $('#sg_configbundle_parametro_nombre').focus();
+});
+</script>

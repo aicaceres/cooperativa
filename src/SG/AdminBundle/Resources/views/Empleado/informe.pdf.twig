@@ -1,0 +1,87 @@
+<pdf>
+    <dynamic-page page-size="A4" margin-left="70px" margin-right="10px" margin-top="40px" >
+        <placeholders>
+            <header>
+                <div height="60px" width="100%">
+                    <table>
+                        <tr>
+                            <td border.type="none">
+                               <img ignore-error="true" src="{{logo}}" width="200px"  margin-bottom="5px"/> 
+                            </td>
+                            <td border.type="none" font-size="16px" text-align="center" vertical-align="bottom" padding-bottom="10px">Datos de Empleados
+                            </td>    
+                            <td border.type="none" font-size="7px" text-align="right" vertical-align="bottom" padding-bottom="5px">
+                                <strong>Fecha y hora: </strong>{{'now'|date('d-m-Y H:i')}} 
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div border.color="#D65200" height="2px" ></div>   
+                 </div>                      
+            </header>
+            <footer>
+                <div height="30px" width="100%" text-align="right">
+                    <page-number />
+                </div>
+            </footer>
+        </placeholders>                     
+        {% if empresa %}
+            <h4><strong>EMPRESA:</strong> {{ empresa.nombre }}</h4>
+            <div height="10px"></div>
+        {% endif %}
+        {% if socio %}
+            <h4><strong>SOCIO:</strong> {{ socio.nombreCompleto }}</h4>
+        {% endif %}
+        <div height="20px"></div>
+        
+        {% for empleado in lista %}
+        <table font-size="9px" height="20px">
+            <tr>
+                <td border.type="none"  vertical-align="middle" ><strong>{{ loop.index }})  {{  empleado.nombreCompleto|upper }} </strong></td>
+                <td border.type="none"  vertical-align="middle" width="4 cm"><strong>N° Documento:</strong> {{ empleado.nroDocumento }}</td>
+                <td border.type="none" vertical-align="middle" width="4 cm"><strong>CUIL/CUIT:</strong> {{ empleado.cuit }}</td>
+                <td border.type="none" vertical-align="middle" width="3 cm"><strong>Fecha Nac.:</strong> {{ empleado.fechaNacimiento|date('d/m/Y') }}</td> 
+            </tr>            
+        </table>
+        <table font-size="9px" height="20px">
+            <tr>
+                <td border.type="none" vertical-align="middle" width="7 cm"><strong>Direccion:</strong> {{  empleado.direccionTxt }}</td>
+                <td border.type="none"  vertical-align="middle"><strong>Teléfonos:</strong> {{ empleado.telefonos }}</td>
+                <td border.type="none" vertical-align="middle" width="5 cm"><strong>Email:</strong> {{ empleado.email }}</td>
+            </tr>            
+        </table>
+            {% if empleado.vehiculos|length>0 %}
+            <div font-size="9px" height="10px" vertical-align="middle"><strong>Vehículos Asignados:</strong></div>
+            <table font-size="7px" padding-bottom="8px" padding-top="4px">
+                <tr>
+                    <td vertical-align="middle" padding-left="8px" height="15px" width="20px"><strong>#</strong></td>
+                    <td vertical-align="middle" padding-left="10px" width="1.5 cm"><strong>Dominio</strong></td>
+                    <td vertical-align="middle" padding-left="10px"><strong>Marca</strong></td>                                        
+                    <td vertical-align="middle" padding-left="10px"><strong>Modelo</strong></td>
+                    <td vertical-align="middle" padding-left="10px" width="1 cm"><strong>Año</strong></td>
+                    <td vertical-align="middle" padding-left="10px"><strong>Líneas</strong></td>
+                    <td vertical-align="middle" padding-left="10px" width="2 cm"><strong>Carga</strong></td>
+                </tr>
+                {% for vehiculo in empleado.vehiculos %}
+                    <tr>
+                        <td vertical-align="middle" padding-left="8px" height="15px">{{ loop.index }}</td>
+                        <td vertical-align="middle" padding-left="10px">{{ vehiculo.dominio }}</td>
+                        <td vertical-align="middle" padding-left="10px">{{ vehiculo.marca }}</td>                                                
+                        <td vertical-align="middle" padding-left="10px">{{ vehiculo.modelo }}</td>
+                        <td vertical-align="middle" padding-left="10px">{{ vehiculo.anio }}</td>                        
+                        <td vertical-align="middle" padding="5px 10px" >{{ vehiculo.lineasTxt|raw }}</td>
+                        <td vertical-align="middle" padding-left="10px">{{ vehiculo.carga }}</td>
+                    </tr>
+                {% endfor %}
+        </table>            
+            {% endif %}
+        <div border.color="#999999" height="1px" margin-bottom="10px"></div>  
+        {% endfor %}
+        
+        
+
+            
+
+     
+    </dynamic-page>
+</pdf>

@@ -1,0 +1,98 @@
+<fieldset>            
+    <div class="form-group col-md-4">
+        <label>Fecha:</label>
+        <div class="input-group">
+            <div class="input-group-addon">
+                <i class="fa fa-calendar"></i>
+            </div>
+            <input type="text" readonly="readonly" class="form-control" value="{{ entity.created|date('d/m/Y') }}">
+        </div><!-- /.input group -->            
+    </div>
+    <div class="col-md-8">
+        <div class="form-group">
+            <div>    
+                <label>Concepto:</label>
+                <input type="text" readonly="readonly" class="form-control" value="{{ entity.concepto }} {% if entity.detalle %} - {% endif %} {{ entity.detalle }}">
+            </div>
+        </div>
+    </div>                                                                                
+</fieldset>                                                                      
+<fieldset>                                                                      
+    <div class="form-group col-md-4">
+        <label>Vencimiento:</label>
+        <div class="input-group">
+            <div class="input-group-addon">
+                <i class="fa fa-calendar"></i>
+            </div>
+            <input type="text" readonly="readonly" class="form-control {% if entity.vencido %} red {% endif %}" value="{{ entity.fechaVto|date('d-m-Y') }}">
+        </div><!-- /.input group -->            
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <div>    
+                <label>Importe:</label>
+                <input type="text" readonly="readonly" class="form-control" value="{{ entity.monto|number_format(2,'.',',') }}">
+            </div>
+        </div>
+    </div> 
+
+    <div class="col-md-2">
+        <div class="form-group">
+            <div>    
+                <label>Interés:</label>
+                <input type="text" readonly="readonly" class="form-control" value="{{ mora|number_format(2,'.',',') }}">
+            </div>
+        </div>
+    </div> 
+    <div class="col-md-3">
+        <div class="form-group">
+            <div>    
+                <label>Total:</label>
+                <input type="text" readonly="readonly" class="form-control" value="{{ (entity.saldo+mora)|number_format(2,'.',',') }}">
+            </div>
+        </div>
+    </div>             
+
+</fieldset>   
+
+<fieldset>                                                                      
+    <div class="col-md-12">
+        <div class="form-group">
+            <div>    
+                <label>Descripción:</label>
+                <textarea readonly="readonly" class="form-control">{{ entity.descripcion }}</textarea>
+            </div>
+        </div>
+    </div>     
+</fieldset>  
+{% if entity.pagos|length >0 %}            
+    <fieldset> 
+        <h5><strong>PAGOS:</strong></h5>
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>                                
+                    <th>#</th>
+                    <th>Fecha</th>
+                    <th>Monto</th>                                
+                    <th>Descripción</th>             
+                </tr>
+            </thead>
+            <tbody>
+                {% for pago in entity.pagos %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ pago.fecha|date('d-m-Y') }}</td>
+                        <td>{{ pago.importe }}</td>
+                        <td>{{ pago.descripcion }}</td>                               
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </fieldset>  
+{% endif %}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".btn-success").hide();
+        $(".btn-danger").text('Cerrar');
+    });
+</script>

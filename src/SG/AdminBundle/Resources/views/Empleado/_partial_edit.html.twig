@@ -1,0 +1,85 @@
+<style>
+.modal-body {
+    overflow-y:visible !important;
+}
+</style>
+<form action="{{urlaction }}" id="formulario-modal" name="empleado" method="post" role="form" {{ form_enctype(form) }}>    
+    
+    {% include "AdminBundle::form-notification.html.twig" %}
+
+    <fieldset>                            
+        <div class="col-md-6">
+            <div class="form-group">
+                {{ form_row(form.nombre, { 'attr': {'class' : 'form-control' } }) }}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                {{ form_row(form.apellido, { 'attr': {'class' : 'form-control' } }) }}
+            </div>
+        </div>                                                                               
+    </fieldset>                                                                      
+    <fieldset>
+        <div class="form-group col-md-4">
+            {{ form_label(form.fechaNacimiento) }}
+            <div class="input-group">
+                <div class="input-group-addon">
+                    <i class="fa fa-calendar"></i>
+                </div>
+                {{ form_widget(form.fechaNacimiento, { 'attr': {'class' : 'form-control' } }) }}
+            </div><!-- /.input group -->
+            {{ form_errors(form.fechaNacimiento) }}
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                {{ form_row(form.nroDocumento, { 'attr': {'class' : 'form-control' } }) }}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                {{ form_row(form.cuit, { 'attr': {'class' : 'form-control' } }) }}
+            </div>
+        </div>        
+    </fieldset>                                                                      
+    <fieldset>        
+        <div class="col-md-7">
+            <div class="form-group">
+                {{ form_row(form.direccion, { 'attr': {'class' : 'form-control' } }) }}
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="form-group">
+                {{ form_row(form.localidad, { 'attr': {'class' : 'chosen form-control' } }) }}
+            </div>
+        </div>                                                                       
+    </fieldset>
+    <fieldset>
+        <div class="col-md-6">
+            <div class="form-group">
+                {{ form_row(form.telefono, { 'attr': {'class' : 'form-control' } }) }}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                {{ form_row(form.celular, { 'attr': {'class' : 'form-control' } }) }}
+            </div>
+        </div>
+    </fieldset>
+    <fieldset>            
+        <div class="col-md-8">
+            <div class="form-group">
+                {{ form_row(form.email, { 'attr': {'class' : 'form-control' } }) }}
+            </div>
+        </div>                                                         
+    </fieldset>        
+    <div style="display:none">{{ form_rest(form) }}</div>
+
+</form>    
+<script type="text/javascript">    
+$(document).ready(function() {    
+    $('#sg_adminbundle_empleado_fechaNacimiento').datepicker();        
+     $("#sg_adminbundle_empleado_localidad").chosen();   
+    $('#sg_adminbundle_empleado_nroDocumento').mask('00000000');
+    $('#sg_adminbundle_empleado_cuit').mask('00-00000000-0');
+});    
+</script>

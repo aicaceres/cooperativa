@@ -1,0 +1,22 @@
+vehiculo_render_modal:
+    path: /renderVehiculoModal
+    defaults: { _controller: "AdminBundle:Vehiculo:renderVehiculoModal" }
+
+vehiculo_create:
+    path:     /create
+    defaults: { _controller: "AdminBundle:Vehiculo:create" }
+    requirements: { _method: post }
+    
+vehiculo_update:
+    path:     /{id}/update
+    defaults: { _controller: "AdminBundle:Vehiculo:update" }
+    requirements: { _method: post|put }    
+    
+vehiculo_delete:
+    path:     /{id}/delete
+    defaults: { _controller: "AdminBundle:Vehiculo:delete" }
+    requirements: { _method: post|delete }    
+    
+vehiculo_show:
+    path:     /{id}/show
+    defaults: { _controller: "AdminBundle:Vehiculo:show" }       

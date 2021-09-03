@@ -1,0 +1,44 @@
+ConfigBundle_usuario:
+    resource: "@ConfigBundle/Resources/config/routing/usuario.yml"
+    prefix:   /usuario/
+
+ConfigBundle_region:
+    resource: "@ConfigBundle/Resources/config/routing/region.yml"
+    prefix:   /region/
+
+ConfigBundle_parametro:
+    resource: "@ConfigBundle/Resources/config/routing/parametro.yml"
+    prefix:   /parametro/
+
+ConfigBundle_perfil:
+    resource: "@ConfigBundle/Resources/config/routing/perfil.yml"
+    prefix:   /perfil
+
+ConfigBundle_permiso:
+    resource: "@ConfigBundle/Resources/config/routing/permiso.yml"
+    prefix:   /permiso
+
+ConfigBundle_auditoria:
+    resource: "@ConfigBundle/Resources/config/routing/auditoria.yml"
+    prefix:   /auditoria
+
+## Locate
+select_provincias:
+    pattern: /provincias
+    defaults: { _controller: ConfigBundle:Utils:provincias}
+select_localidades:
+    pattern: /localidades
+    defaults: { _controller: ConfigBundle:Utils:localidades}
+get_codpostal:
+    pattern: /codPostal
+    defaults: { _controller: ConfigBundle:Utils:codPostal}
+
+
+## Login de usuario
+login:
+    pattern:  /ingresar
+    defaults: { _controller: ConfigBundle:Usuario:login }
+check_path:
+  pattern: /login_check
+logout:
+  pattern: /logout

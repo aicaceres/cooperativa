@@ -1,0 +1,6 @@
+services:
+    admin.type.socio_selector:
+            class: SG\AdminBundle\Form\Type\SocioSelectorType
+            arguments: ["@doctrine.orm.entity_manager"]
+            tags:
+                - { name: form.type, alias: socio_selector }

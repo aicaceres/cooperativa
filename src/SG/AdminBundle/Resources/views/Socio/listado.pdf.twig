@@ -1,0 +1,60 @@
+<pdf>
+    <dynamic-page page-size="A4-landscape" margin-left="70px" margin-right="40px" margin-top="40px" >
+        <placeholders>
+            <header>
+                <div height="85px" width="100%">
+                    <table>
+                        <tr>
+                            <td border.type="none">
+                               <img ignore-error="true" src="{{logo}}" width="330px" height="70px" margin-bottom="5px"/> 
+                            </td>
+                            <td border.type="none" font-size="16px" text-align="center" vertical-align="bottom" padding-bottom="10px">Nómina de Socios
+                            </td>    
+                            <td border.type="none" font-size="7px" text-align="right" vertical-align="bottom" padding-bottom="5px">
+                                <strong>Fecha y hora: </strong>{{'now'|date('d-m-Y H:i')}} 
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div border.color="#D65200" height="2px" ></div>   
+                 </div>                      
+            </header>
+            <footer>
+                <div height="30px" width="100%" text-align="right">
+                    <page-number />
+                </div>
+            </footer>
+        </placeholders>
+        
+        <div height="10px"></div>
+        {% if empresa %}
+            <h4>EMPRESA: {{ empresa.nombre }}</h4>
+        {% endif %}
+        <div height="20px"></div>
+        
+        
+        <table font-size="7px">
+                <tr>
+                    <td vertical-align="middle" padding-left="10px" height="20px"><strong>Nombre y Apellido</strong></td>
+                    <td vertical-align="middle" padding-left="10px" width="2 cm"><strong>N° Documento</strong></td>
+                    <td vertical-align="middle" padding-left="10px" width="1.5 cm"><strong>Fecha Nac.</strong></td>                                        
+                    <td vertical-align="middle" padding-left="10px"><strong>Domicilio Particular</strong></td>
+                    <td vertical-align="middle" padding-left="10px"><strong>Teléfonos</strong></td>
+                    <td vertical-align="middle" padding-left="10px"><strong>Email</strong></td>
+                    <td vertical-align="middle" padding-left="10px" width="2 cm"><strong>Localidad</strong></td>
+                </tr>
+                {% for socio in socios %}
+                    <tr>
+                        <td vertical-align="middle" padding-left="10px" height="20px">{{ socio.nombreCompleto }}</td>
+                        <td vertical-align="middle" padding-left="10px">{{ socio.nroDocumento }}</td>
+                        <td vertical-align="middle" padding-left="10px">{{ socio.fechaNacimiento|date('d/m/Y') }}</td>                                                
+                        <td vertical-align="middle" padding-left="10px">{{ socio.direccion }}</td>
+                        <td vertical-align="middle" padding-left="10px">{{ socio.telefonos }}</td>                        
+                        <td vertical-align="middle" padding-left="10px">{{ socio.email }}</td>
+                        <td vertical-align="middle" padding-left="10px">{{ socio.localidad }}</td>
+                    </tr>
+                {% endfor %}
+        </table>
+
+    </dynamic-page>
+</pdf>

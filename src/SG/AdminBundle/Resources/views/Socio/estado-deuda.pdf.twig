@@ -1,0 +1,135 @@
+<pdf>
+    <dynamic-page page-size="A4" margin-left="70px" margin-right="40px" margin-top="50px" >
+        <placeholders>
+            <header>
+                <div height="85px" width="100%">
+                    <table>
+                        <tr>
+                            <td border.type="none">
+                               <img ignore-error="true" src="{{logo}}" width="330px" height="70px" margin-bottom="5px"/> 
+                            </td>
+                            <td border.type="none" font-size="7px" text-align="right" vertical-align="bottom" padding-bottom="5px">
+                                <strong>Fecha y hora: </strong>{{'now'|date('d-m-Y H:i')}} 
+                            </td>
+                        </tr>
+                    </table>
+                    <div border.color="#D65200" height="2px" ></div>   
+                 </div>                      
+            </header>
+            <footer>
+                <div height="30px" width="100%" text-align="right">
+                    <page-number />
+                </div>
+            </footer>
+        </placeholders>
+        
+        <table>
+            <tr>
+                <td border.type="none" width="15 cm">
+                    <table font-size="11px">
+                        <tr>                           
+                            <td height="35px" vertical-align="middle" padding-left="10px" margin-bottom="10px" border.type="none">
+                                Apellido y Nombre: <strong>{{ socio.nombreCompleto}}</strong>
+                            </td>
+                            <td height="35px" width="3 cm" vertical-align="middle" padding-left="10px" margin-bottom="10px" border.type="none">
+                                DNI: <strong>{{ socio.nroDocumento}}</strong>
+                            </td>                            
+                        </tr>
+                    </table>
+                    <table font-size="9px">
+                        <tr>
+                            <td height="10px" vertical-align="middle" padding-left="10px" margin-bottom="10px" border.type="none">
+                                Dirección: <strong>{{ socio.direccionTxt}}</strong>
+                            </td>
+                            <td height="10px" vertical-align="middle" padding-left="10px" margin-bottom="10px" border.type="none">
+                                Teléfonos: <strong>{{ socio.telefonos}}</strong>
+                            </td>
+                            <td height="10px" vertical-align="middle" padding-left="10px" margin-bottom="10px" border.type="none">
+                                Email: <strong>{{ socio.email}}</strong>
+                            </td>
+                        </tr>
+                    </table>                    
+                </td>                
+            </tr>
+        </table>
+         <div height="10px"></div>           
+                    
+        <div border.color="black" border.type="top+bottom" background.color="#DDDDDD"  height="25px" text-align="center" vertical-align="middle">
+            <strong>Estado de Deuda </strong>
+        </div>
+
+        {% if socio.deudas  %}
+            <table font-size="9px">
+                <tr>
+                    <td border.type="bottom" height="20px" vertical-align="middle" padding-right="3px" text-align="right" width="15 px">
+                        <strong>#</strong>  
+                    </td>
+                    <td border.type="bottom" vertical-align="middle" padding-left="10px">
+                        <strong>Fecha</strong>  
+                    </td>
+                    <td border.type="bottom" vertical-align="middle" padding-left="10px"  width="6 cm">
+                        <strong>Concepto</strong> 
+                    </td>
+                    <td border.type="bottom" vertical-align="middle" padding-left="10px">
+                        <strong>Vto</strong> 
+                    </td>
+                    <td border.type="bottom" vertical-align="middle" padding-right="10px" text-align="right">
+                        <strong>Importe</strong> 
+                    </td>
+                    <td border.type="bottom" vertical-align="middle" padding-right="10px" text-align="right">
+                        <strong>Interés</strong> 
+                    </td>
+                    <td border.type="bottom" vertical-align="middle" padding-right="10px" text-align="right" >
+                        <strong>Total</strong> 
+                    </td>
+                    <td border.type="bottom" vertical-align="middle" padding-left="10px">
+                        <strong>Pago</strong> 
+                    </td>
+                    <td border.type="bottom" vertical-align="middle" padding-right="10px" text-align="right">
+                        <strong>Saldo</strong> 
+                    </td>
+                </tr>
+                {% set i,importe,interes,total, saldoVencido = 1,0,0,0,0 %}
+                {% for deuda in socio.deudas if deuda.concepto.tipo!='L' %}
+                    {% if (vencido=='true' and deuda.vencido) or vencido=='false'  %}  
+                
+                    {% set importe,interes,total = importe+deuda.monto , interes+deuda.mora, total+deuda.saldo %}      
+                    {% if deuda.vencido %}  {% set saldoVencido = saldoVencido + deuda.saldo %} {% endif %}               
+                    <tr>
+                        <td border.type="bottom" height="20px" vertical-align="middle" text-align="right" padding-right="3px" font-size="8px">{{ i }}.</td>
+                        <td border.type="bottom" vertical-align="middle" text-align="center">{{ deuda.created|date('d-m-Y') }}</td>
+                        <td border.type="bottom" vertical-align="middle" padding-left="10px" width="6 cm">{{ deuda.concepto~' - '~deuda.descripcion }}</td>
+                        <td border.type="bottom" vertical-align="middle" padding-left="10px" {% if deuda.vencido %} color="red" {% endif %} >{{ deuda.fechaVto|date('d-m-Y') }}</td>
+                        <td border.type="bottom" vertical-align="middle" padding-right="10px" text-align="right">{{ deuda.monto|number_format(2,'.',',') }}</td>
+                        <td border.type="bottom" vertical-align="middle" padding-right="10px" text-align="right">{{ deuda.mora|number_format(2,'.',',') }}</td>
+                        <td border.type="bottom" vertical-align="middle" padding-right="10px" text-align="right"><strong>{{ (deuda.monto+deuda.mora)|number_format(2,'.',',') }}</strong></td>
+                        <td border.type="bottom" vertical-align="middle" text-align="center">{%if deuda.ultimoPago %}{{deuda.ultimoPago|date('d-m-Y')}}{% endif %}
+                        </td>
+                        <td border.type="bottom" vertical-align="middle" padding-right="10px" text-align="right" {% if deuda.vencido %} color="red" {% endif %}>
+                            <strong>{{deuda.saldo|number_format(2,'.',',')}}</strong>
+                        </td>
+                    </tr>
+                    {% set i = i+1 %}
+                    {% endif %}
+                {% endfor %}
+                <tr><td colspan="9" height="20px" border.type="none"></td></tr>
+                <tr>
+                    <td colspan="4" height="20px" border.type="none"></td>
+                    <td colspan="2" border.type="top+bottom+left" vertical-align="middle" text-align="right" background.color="#DDDDDD">
+                        <strong>Total Adeudado:</strong>
+                    </td>
+                    <td border.type="top+bottom" vertical-align="middle" padding-right="7px" text-align="right" background.color="#DDDDDD">
+                        <strong>{{total|number_format(2,'.',',')}}</strong>
+                    </td>                    
+                    <td border.type="top+bottom+left" vertical-align="middle" text-align="right" background.color="#DDDDDD">
+                        <strong>Vencido:</strong>
+                    </td>
+                    <td border.type="top+bottom+right" vertical-align="middle" padding-right="10px" text-align="right" {% if saldoVencido>0 %} color="red" {% endif %} background.color="#DDDDDD">
+                        <strong>{{saldoVencido|number_format(2,'.',',')}}</strong>
+                    </td>                    
+                </tr>                
+            </table>
+        {% endif %}  
+     
+    </dynamic-page>
+</pdf>

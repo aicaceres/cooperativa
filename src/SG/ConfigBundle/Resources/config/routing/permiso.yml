@@ -1,0 +1,26 @@
+seguridad_permiso:
+    pattern:  /
+    defaults: { _controller: "ConfigBundle:Permiso:index" }
+
+seguridad_permiso_new:
+    pattern:  /new
+    defaults: { _controller: "ConfigBundle:Permiso:new" }
+
+seguridad_permiso_edit:
+    pattern:  /{id}/edit
+    defaults: { _controller: "ConfigBundle:Permiso:edit" }
+
+seguridad_permiso_create:
+    pattern:  /create
+    defaults: { _controller: "ConfigBundle:Permiso:create" }
+    requirements: { _method: post }
+
+seguridad_permiso_update:
+    pattern:  /{id}/update
+    defaults: { _controller: "ConfigBundle:Permiso:update" }
+    requirements: { _method: post|put }
+
+seguridad_permiso_delete:
+    pattern:  /{id}/delete
+    defaults: { _controller: "ConfigBundle:Permiso:delete" }
+    requirements: { _method: post|delete }

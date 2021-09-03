@@ -1,0 +1,1 @@
+INSERT INTO `permiso` (`id`, `created_by`, `modulo`, `item`, `tag`, `texto`, `created`) VALUES (NULL, '1', 'socio', 'abm', 'informes', 'Informes', '2016-07-17 12:01:03');

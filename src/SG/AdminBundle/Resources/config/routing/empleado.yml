@@ -1,0 +1,34 @@
+empleado_render_modal:
+    path: /renderEmpleadoModal
+    defaults: { _controller: "AdminBundle:Empleado:renderEmpleadoModal" }
+
+empleado_create:
+    path:     /create
+    defaults: { _controller: "AdminBundle:Empleado:create" }
+    requirements: { _method: post }
+    
+empleado_update:
+    path:     /{id}/update
+    defaults: { _controller: "AdminBundle:Empleado:update" }
+    requirements: { _method: post|put }    
+    
+empleado_delete:
+    path:     /{id}/delete
+    defaults: { _controller: "AdminBundle:Empleado:delete" }
+    requirements: { _method: post|delete }    
+    
+empleado_show:
+    path:     /{id}/show
+    defaults: { _controller: "AdminBundle:Empleado:show" }        
+    
+empleados_x_socio:
+    path: /{id}/lista
+    defaults: { _controller: "AdminBundle:Empleado:listaxsocio" }
+    
+empleado_informe:
+    path: /informe
+    defaults: { _controller: "AdminBundle:Empleado:informe" }
+    
+empleado_print_informe:
+    path: /printInforme.{_format}
+    defaults: { _controller: "AdminBundle:Empleado:printInforme", _format: 'pdf' }      

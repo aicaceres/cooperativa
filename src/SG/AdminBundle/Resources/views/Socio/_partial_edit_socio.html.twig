@@ -1,0 +1,116 @@
+
+<form action="{{urlupdate }}" method="post" role="form" {{ form_enctype(form) }}>                
+    {% include "AdminBundle::form-notification.html.twig" %}
+
+    <fieldset>                            
+        <div class="col-md-3">
+            <div class="form-group">
+                {{ form_row(form.nombre, { 'attr': {'class' : 'form-control' } }) }}
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                {{ form_row(form.apellido, { 'attr': {'class' : 'form-control' } }) }}
+            </div>
+        </div>   
+        <div class="col-md-2">
+            <div class="form-group">
+                {{ form_row(form.nroDocumento, { 'attr': {'class' : 'form-control' } }) }}
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                {{ form_row(form.cuit, { 'attr': {'class' : 'form-control' } }) }}
+            </div>
+        </div>
+        <div class="form-group col-md-2">
+            {{ form_label(form.fechaNacimiento) }}
+            <div class="input-group">
+                <div class="input-group-addon">
+                    <i class="fa fa-calendar"></i>
+                </div>
+                {{ form_widget(form.fechaNacimiento, { 'attr': {'class' : 'form-control datepicker pasada' } }) }}
+            </div><!-- /.input group -->
+            {{ form_errors(form.fechaNacimiento) }}
+        </div>                                                            
+    </fieldset>                                                                      
+    <fieldset>
+        <div class="col-md-6">
+            <div class="form-group">
+                {{ form_row(form.direccion, { 'attr': {'class' : 'form-control' } }) }}
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                {{ form_row(form.localidad, { 'attr': {'class' : 'chosen form-control' } }) }}
+            </div>
+        </div>
+        <div class="col-md-1 pull-right">
+            <div class="form-group">
+                {{ form_row(form.activo, { 'attr': {'class' : 'form-control' } }) }}
+            </div>
+        </div>                                                                
+    </fieldset>
+    <fieldset>
+        <div class="col-md-3">
+            <div class="form-group">
+                {{ form_row(form.telefono, { 'attr': {'class' : 'form-control' } }) }}
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                {{ form_row(form.celular, { 'attr': {'class' : 'form-control' } }) }}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                {{ form_row(form.email, { 'attr': {'class' : 'form-control' } }) }}
+            </div>
+        </div>                                                         
+    </fieldset>
+    <fieldset> 
+        <div class="col-md-5">
+            <div class="form-group">
+                {{ form_row(form.contacto, { 'attr': {'class' : 'form-control' } }) }}
+            </div>
+        </div> 
+        <div class="col-md-7 form-group">        
+            {{ form_label(form.empresas) }}
+            <div class="input-group">
+                {{ form_widget(form.empresas, { 'attr': {'class' : 'chosen form-control',
+                                        'data-placeholder' : 'Seleccionar...','multiple' : 'multiple' } }) }}                 
+                {% if app.user.perfil.parametro %}   
+                    <span class="input-group-btn" style="padding-left: 5px;">
+                        <button data-toggle="tooltip" title="Agregar empresa" type="button" data-tabla="Empresa" data-url="{{path('parametro_render_add')}}"
+                                class="btn btn-default btn-flat btn-xs addParametro"><i class="fa fa-plus"></i></button>
+                    </span>
+                {% endif %}                                
+            </div>
+            {{ form_errors(form.empresas) }}        
+        </div>                                 
+    </fieldset>
+    <div style="display:block">{{ form_rest(form) }}</div>
+    <br>
+    <fieldset>
+        <div class="col-md-2">
+            {% if entity.id and 'socio-abm-delete' in app.user.perfil.permisos %}
+                <a type="button" class="btn btn-app delete" href="javascript:void(0)"><i class="fa fa-trash-o"></i> Eliminar</a>
+            {%endif%}
+        </div>
+        <div class="btn-group col-md-10 ">
+            <div class="pull-right">
+                <button type="submit" class="btn btn-app"><i class="fa fa-save"></i> Guardar</button>
+                {% if not entity.id  %}
+                    <button type="submit" class="btn btn-app" id="savenew"><i class="fa fa-save"></i> Guardar y Nuevo</button>
+                {%endif%}
+                <a type="button" class="btn btn-app" href="{{ path('socio_abm')}}"><i class="fa fa-reply"></i> Cancelar</a>
+            </div>
+        </div>
+    </fieldset>
+    
+    
+</form>    
+
+{% if entity.id and 'socio-abm-delete' in app.user.perfil.permisos %}
+    {{ form(delete_form) }}
+{%endif%}

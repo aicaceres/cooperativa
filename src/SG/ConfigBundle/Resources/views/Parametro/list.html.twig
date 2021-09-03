@@ -1,0 +1,47 @@
+<div class="clearfix">
+    <a id="addNew" class="btn btn-warning pull-right" href="{{ path('parametro_new', { 'table': table }) }}" 
+       data-toggle="tooltip" title="Agregar Nuevo"><i class="fa fa-cog"></i> &nbsp;Agregar</a>
+</div>
+<br>
+{% set deSistema = 0 %}
+<table id="tablelist" class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th class="nosort">#</th>
+            <th>Descripción</th>
+            {% if table=='Empresa' %}
+            <th># Socios</th>
+            {% endif %}
+            {% if table=='ConceptoCaja' %}
+            <th>Tipo</th>            
+            <th>Monto</th>            
+            <th>Relaciona Socio</th> 
+            {% endif %}
+            <th class="nosort">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entity in entities %}            
+        {% if table=='ConceptoCaja' %} {% set deSistema = entity.deSistema %}  {% endif %}
+        <tr>
+            <td>{{ entity.id }}</td>
+            <td>{{ entity.nombre }}</td>
+            {% if table=='Empresa' %}
+                <td>{{ entity.socios|length }}</td>
+            {% endif %}    
+            {% if table=='ConceptoCaja' %}
+            <td>{% if entity.tipo=='I' %}Ingreso{% elseif entity.tipo=='E' %}Egreso {% else %} Liquidación {% endif %}</td>
+            <td>{{entity.monto|number_format(2,'.','')}}</td>
+            <td> {% if entity.requiereSocio %}Si{% else %}No{% endif %}</td>       
+            {% endif %}
+            <td class="link-actions">
+                {% if not deSistema %}
+                <a href="{{ path('parametro_edit', { 'table': table, 'id': entity.id }) }}" data-toggle="tooltip" title="Editar"><i class="fa fa-edit"></i></a>&nbsp;
+                
+                <a href="{{ path('parametro_delete', { 'table': table, 'id': entity.id }) }}" data-toggle="tooltip" title="Eliminar" onclick="if (!confirm('Desea eliminar este Parametro?')) return false;"><i class="fa fa-trash-o"></i></a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}       
+    </tbody>
+</table>    

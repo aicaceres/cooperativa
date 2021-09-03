@@ -1,0 +1,264 @@
+{% extends "AdminBundle::layout.html.twig" %}
+
+{% if entity.id  %}
+    {% set pagetitle= entity.nombreCompleto%}
+    {% set urlupdate=path('socio_update', { 'id': entity.id }) %}
+{% else %}
+    {% set pagetitle= 'Alta de Nuevo Socio' %}
+    {% set urlupdate=path('socio_create') %}
+{%endif%}
+{% block contentheader %}
+<h1> Socios </h1>
+{% endblock %}
+
+{% block content %}
+    <div class='row'>
+        <div class='col-md-12'>
+            
+                <div class="nav-tabs-custom">
+                    <ul class="nav nav-tabs pull-right">
+                        {% if entity.id  %}
+                        <li><a href="#tab_vehiculos" data-toggle="tab">VEHÍCULOS</a></li>
+                        <li><a href="#tab_empleados" data-toggle="tab">EMPLEADOS</a></li>
+                        {% endif %}
+                        <li class="active"><a href="#tab_socio" data-toggle="tab">DATOS DEL SOCIO</a></li>              
+                        <li class="pull-left header"><i class="ion ion-person" style="font-size: 30px"></i> {{ pagetitle }} </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane" id="tab_vehiculos">
+                            {% include "AdminBundle:Vehiculo:_partial_list.html.twig" %}                                                     
+                                <br>
+                        </div>
+                        <!-- /.tab-pane -->
+                        <div class="tab-pane" id="tab_empleados">
+                            {% include "AdminBundle:Empleado:_partial_list.html.twig" %}                                                    
+                                <br>
+                        </div>
+                        <!-- /.tab-pane -->
+                        <div class="tab-pane active" id="tab_socio" data-id="{{ entity.id }}">
+                            <div class='box-body pad'>
+                                {% include "AdminBundle:Socio:_partial_edit_socio.html.twig" %}
+                                <br>  
+                            </div>
+
+                        </div>
+                        <!-- /.tab-pane -->
+
+                    </div>
+                    <!-- /.tab-content -->
+                   
+                </div>
+                <!-- nav-tabs-custom -->
+                
+
+        </div><!-- /.col-->
+    </div><!-- ./row -->
+{% endblock %}
+{% block page_javascript %}
+<script src="{{ asset('assets/js/tables.js') }}" type="text/javascript"></script>    
+<script src="{{ asset('assets/js/jquery.mask.js') }}" type="text/javascript"></script>    
+<script type="text/javascript">
+$(document).ready(function() {
+    $(".chosen").chosen();      
+    $('#sg_adminbundle_socio_nroDocumento').mask('00000000');
+    $('#sg_adminbundle_socio_cuit').mask('00-00000000-0');
+    var today = new Date();
+    $('#sg_adminbundle_socio_fechaNacimiento').datepicker({
+        endDate: today
+    })
+    // AGREGAR EMPRESA EN SOCIO    
+    $('body').on('click','.addParametro',function(e) {
+        e.preventDefault();
+        var tabla = $(this).data('tabla');
+        var data = 'tabla='+tabla;       
+        var objNombre = '#sg_configbundle_parametro_nombre';        
+        var objSel = $(this).parent().parent().find('select');        
+        var urlbase =  $(this).data('url');
+        eModal.setModalOptions({
+            backdrop: 'static',
+            keyboard: false
+        });
+        var options = {
+           url: urlbase,
+           data: data,
+           title:'Empresa',
+           subtitle: 'Agregar nuevo',
+           size: eModal.size.sm,
+           buttons: [
+               {text: 'Guardar', style: 'success', close: true, 
+                   click: function(){
+                       if( isEmpty( $(objNombre).val() ) ){
+                           alert('Debe completar la descripción.');
+                           $(objNombre).focus();
+                           return false;
+                       }                                  
+                       $.ajax({
+                           url: $('#create_url').val(),
+                           data: $("[name='sg_configbundle_parametro']").serialize(),
+                           type: 'POST',
+                           dataType: 'JSON',
+                           success: function(data){                               
+                              if(data.msg == 'OK'){                                        
+                                  objSel.append('<option value="'+data.id+'">'+data.nombre+'</option>');
+                                  var values = objSel.val();
+                                  if(values){
+                                      values.push(data.id);
+                                  }else{
+                                      values = data.id;
+                                  }                                  
+                                  objSel.val(values);           
+                                  objSel.trigger("chosen:updated");
+                              }else{                                                                                                      
+                                 alert(data.msg);   
+                               }     
+                           }
+                       });
+                       
+                   } },
+               {text: 'Cancelar', style: 'danger', close: true }
+           ]
+       };
+       eModal.ajax(options);                   
+    });        
+
+  // show empleados y vehiculos
+    $('body').on('click','.show-modal',function(e) {
+        var urlbase =  $(this).data('url');  
+        var size = (~urlbase.indexOf("empleado") == 0) ? eModal.size.lg : eModal.size.sm;
+        eModal.setModalOptions({
+            backdrop: 'static',
+            keyboard: false
+        });
+        var options = {           
+           url: urlbase,          
+           size: size,
+           buttons: [               
+               {text: 'Cerrar', style: 'danger', close: true }
+           ]
+       };
+       eModal.ajax(options); 
+    });
+
+
+    // TAB EMPLEADO  
+    //var eTable = $('#table-empleados').DataTable();
+    var eTable = $('#table-empleados');
+
+    // TAB VEHICULOS  
+    //var vTable = $('#table-vehiculos').DataTable();
+    var vTable = $('#table-vehiculos');
+    
+    // CREATE OR EDIT EMPLEADOS Y VEHICULOS 
+    $('body').on('click','.empleado-modal, .vehiculo-modal',function(e) {
+        e.preventDefault(); 
+        if( $(this).hasClass('empleado-modal') ){
+            var table = eTable;  
+            var title = 'Empleado';
+            var spancnt = $('#empleados-count');
+            var relatedTab = $('#tab_vehiculos');            
+        }else{
+            var table = vTable;  
+            var title = 'Vehículo'; 
+            var spancnt = $('#vehiculos-count');
+            var relatedTab = $('#tab_empleados');            
+        }
+              
+        var id = $(this).data('id');
+        var socio = $(this).data('socio');
+        var data = { id: id, socio: socio };       
+        var urlbase =  $(this).data('url');                 
+        var subtitle = (id) ? 'Editar' : 'Agregar nuevo';  
+        var row = $(this).closest('tr');           
+        eModal.setModalOptions({
+                backdrop: 'static',
+                keyboard: false
+            });
+        var options = {
+           url: urlbase,
+           data: data,
+           title: title,
+           subtitle: subtitle,
+           size: eModal.size.sm,           
+           buttons: [
+               {text: 'Guardar', style: 'success', close: true, 
+                   click: function(){                             
+                       if( $(":invalid").length ){
+                           alert('Debe completar los datos.');                          
+                           return false;
+                       }                                   
+                       $.ajax({
+                           url: $('#formulario-modal').attr('action'),
+                           data: $("#formulario-modal").serialize(),
+                           type: 'POST',
+                           dataType: 'JSON',
+                           success: function(data){                                     
+                              if(data.msg == 'OK'){                                     
+                                 if(row.length){
+                                     // actualizar
+                                     row.replaceWith(data.trhtml)  
+                                     
+                                 }else{
+                                     // agregar nuevo                                     
+                                     $(data.trhtml).appendTo( table )
+                                    // incrementar cuenta  
+                                    spancnt.html( parseInt(spancnt.html())+1 )
+                                 } 
+                                 // actualizar datos en tabla related
+                                 if( data.partial ){
+                                    relatedTab.html(data.partial);                                                             
+                                }                            
+                              }else{                                                                                                      
+                                 alert(data.msg);   
+                               }     
+                           }
+                       });                       
+                       
+                   } },
+               {text: 'Cancelar', style: 'danger', close: true }
+           ]
+       };       
+       eModal.setId('socio-modal');       
+       eModal.ajax(options);       
+    });             
+        
+    // BORRAR REGISTRO DE EMPLEADO O VEHICULO
+    $('body').on('click','.delete-tab',function(e){
+        var url = $(this).data('url'); 
+        if( $(this).closest('.table').attr('id') == 'table-empleados' ){
+           var spancnt = $('#empleados-count');           
+           var relatedTab = $('#tab_vehiculos');
+        }else{
+           var spancnt = $('#vehiculos-count');           
+           var relatedTab = $('#tab_empleados');
+        }
+        var row = $(this).closest('tr');        
+        r = confirm('Está seguro de eliminar este registro?');
+        if (r) {            
+            $.ajax({
+                url: url,
+                async: true,
+                type: "POST",
+                dataType: 'JSON',
+                success: function(data) {                    
+                    if (data.msg === "OK") {
+                       row.remove();
+                       // decrementar cuenta
+                       spancnt.html( parseInt(spancnt.html())-1 )
+                       // actualizar datos en tabla related
+                       if( data.partial ){
+                            relatedTab.html(data.partial);                                                   
+                        }
+                        alert('El registro se eliminó con éxito');                                                                        
+                    } else                        
+                        alert(data.msg);
+                }, error: function() {
+                    alert('No se puede realizar la operación en este momento');
+                }
+            });
+        }
+        return false;
+    });
+    
+});
+</script>
+{%endblock %}

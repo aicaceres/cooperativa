@@ -1,0 +1,104 @@
+socio_abm:
+    path:     /administracion
+    defaults: { _controller: "AdminBundle:Socio:list" }
+
+socio_abm_show:
+    path:     /{id}/show
+    defaults: { _controller: "AdminBundle:Socio:show" }
+
+socio_abm_new:
+    path:     /new
+    defaults: { _controller: "AdminBundle:Socio:new" }
+
+socio_create:
+    path:     /create
+    defaults: { _controller: "AdminBundle:Socio:create" }
+    requirements: { _method: post }
+
+socio_abm_edit:
+    path:     /{id}/edit
+    defaults: { _controller: "AdminBundle:Socio:edit" }
+
+socio_update:
+    path:     /{id}/update
+    defaults: { _controller: "AdminBundle:Socio:update" }
+    requirements: { _method: post|put }
+
+socio_abm_delete:
+    path:     /{id}/delete
+    defaults: { _controller: "AdminBundle:Socio:delete" }
+    requirements: { _method: post|delete }
+
+socio_suggest:
+  pattern: /suggest
+  defaults: { _controller: "AdminBundle:Socio:getSocioSuggest"  }  
+  
+socio_print_listado:
+    path: /printListado.{_format}
+    defaults: { _controller: "AdminBundle:Socio:printListado", _format: 'pdf' }      
+ 
+##Cuenta corriente  
+socio_ctacte:
+    path:     /estadoDeuda/{id}
+    defaults: { _controller: "AdminBundle:Deuda:ctacte", id:0 }
+    
+socio_ctacte_newdeuda:
+    path:     /newDeuda
+    defaults: { _controller: "AdminBundle:Deuda:newDeuda" }
+    
+socio_create_deuda:
+    path:     /createDeuda
+    defaults: { _controller: "AdminBundle:Deuda:createDeuda" }
+    requirements: { _method: post }  
+    
+socio_delete_deuda:
+    path:     /{id}/deleteDeuda
+    defaults: { _controller: "AdminBundle:Deuda:deleteDeuda" }
+    requirements: { _method: post }    
+
+socio_datosCtaCte:
+  pattern: /datosCtaCte
+  defaults: { _controller: "AdminBundle:Deuda:getDatosCtaCte"  }   
+  
+get_socio_deuda:
+    pattern:  /getDeuda
+    defaults: { _controller: "AdminBundle:Deuda:getDeuda" }    
+    
+print_estado_deuda:
+    path: /{id}/printEstadoDeuda.{_format}
+    defaults: { _controller: "AdminBundle:Deuda:printEstadoDeuda", _format: 'pdf' }   
+    
+export_estado_deuda:
+    path: /{id}/exportEstadoDeuda
+    defaults: { _controller: "AdminBundle:Deuda:exportEstadoDeuda" }    
+
+deuda_show:
+    path:     /{id}/{mora}/deudaShow
+    defaults: { _controller: "AdminBundle:Deuda:deudaShow" }    
+    
+##Mailing
+socio_mailing:
+    path:     /mailing
+    defaults: { _controller: "AdminBundle:Socio:mailing" }
+    
+send_mailing:
+    path:     /sendMailing
+    defaults: { _controller: "AdminBundle:Socio:sendMailing" }    
+    
+## Liquidaciones
+socio_liquidacion:
+    path:     /liquidaciones/{id}
+    defaults: { _controller: "AdminBundle:Socio:liquidacion", id:0 }
+socio_datosLiquidaciones:
+  pattern: /datosLiquidaciones
+  defaults: { _controller: "AdminBundle:Socio:getDatosLiquidaciones"  }  
+  
+## INFORMES
+socio_informexempresa:
+    path:     /informePorEmpresa/{id}
+    defaults: { _controller: "AdminBundle:Socio:informePorEmpresa", id:0 }
+    
+    
+socio_import:
+    path:     /import
+    defaults: { _controller: "AdminBundle:Socio:import" }    

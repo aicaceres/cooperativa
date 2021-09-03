@@ -1,0 +1,97 @@
+<span><strong>Dirección:</strong> {{ socio.direccion }}</span>
+<span><strong>Teléfonos:</strong> {{ socio.telefonos }}</span>
+<span><strong>Localidad:</strong> {{ socio.localidad }}</span>
+<h4>Conceptos Pendientes</h4>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th class="nosort">Fecha</th>
+                <th class="nosort">Concepto</th>
+                <th class="nosort">Vencimiento</th>
+                <th class="nosort">Importe</th>
+                <th class="nosort">Interés</th>
+                <th class="nosort">Total</th>
+                <th class="nosort">SALDO</th>
+                <th class="nosort" style="width:5%"></th>
+            </tr>
+        </thead>
+        <tbody>            
+            {% for deuda in socio.deudas if deuda.saldo>0 and deuda.concepto.tipo !='L' %}  
+                <tr class="odd gradeX">
+                    <td>{{ deuda.created|date('d-m-Y') }}</td>
+                    <td>{{ deuda.deudaTxt }}</td>
+                    <td {% if deuda.vencido %} class="red" {% endif %} >{{ deuda.fechaVto|date('d-m-Y') }}</td>
+                    <td class="alignright">{{ deuda.monto|number_format(2,'.',',') }}</td>
+                    <td class="alignright">{{ deuda.mora|number_format(2,'.',',') }}</td>
+                    <td class="alignright">{{ (deuda.monto+deuda.mora)|number_format(2,'.',',') }}</td>
+                    <td class="alignright total {% if deuda.vencido %} red {% endif %}">
+                        {{deuda.saldo|number_format(2,'.',',')}}
+                    </td>
+                    <td>
+                        <input type="checkbox" name="chkcuota" class="chkcuota" data-id="{{deuda.id}}" data-concepto="{{deuda.concepto.id}}" data-txt="{{deuda.deudaTxt}}">
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="6" class="alignright">Total a Pagar</th>
+                <th class="alignright" id="total">0.00</th>
+            </tr>
+        </tfoot>
+            
+    </table>
+</div>
+        
+<div class="modal-footer" style="padding:10px 20px 0px;">
+        <div class="btn-group pull-right">
+            <button type="button" class="btn btn-primary" id="addNewItem"><i class="fa fa-check"></i> Aceptar</button>
+            <button type="button" class="btn btn-default" id="cancelModal"><i class="fa fa-reply"></i> Cancelar</button>
+        </div>
+    </div>        
+<script type="text/javascript">
+$(document).ready(function() {    
+    $('.chkcuota').change( function(){
+        actualizarTotalDeuda();
+    } );
+    $('#cancelModal').on('click',function(){
+        $('.limpiar').click();
+        $('#socio-modal').modal('hide');
+    });
+    $('#addNewItem').on('click',function(){        
+        var cantidad = $('.chkcuota:checked').length;
+        var holder = $('.collectionHolder');
+        $('#sg_adminbundle_cajamovimiento_responsablePago').val( $('#socioAutocomplete').val() );        
+        if(cantidad>0){
+            $('.chkcuota:checked').each(function( index ) {
+                var id = $(this).data('id');
+                var txt = $(this).data('txt');
+                var concepto = $(this).data('concepto');
+                var monto = parseFloat( $(this).parent().siblings('.total').text().replace(',','') );
+                // crear nuevos tr
+                addNewItem( holder );
+                var item = holder.find('.td').last();
+                item.find('[id$="_importe"]').prop('readonly',true);
+                item.find('[id$="_concepto"]').val(concepto);                              
+                item.find('[id$="_deuda"]').val( id );
+                item.find('[id$="_importe"]').val( monto.toFixed(2) );
+                //item.find('[id$="_saldo"]').val( monto );
+                item.find('[id$="_descripcion"]').val( 'Pago de '+txt );
+                actualizaTotales();
+            });   
+        } 
+        $('#socio-modal').modal('hide');
+    });
+});
+
+function actualizarTotalDeuda(){
+    var totalfinal = 0;
+    $('.chkcuota:checked').each(function( index ) {
+        var total = $(this).parent().siblings('.total').text().replace(',','');
+        totalfinal =  totalfinal + parseFloat(total) ;
+    });
+    $('#total').text(totalfinal.toFixed(2));
+}
+</script>

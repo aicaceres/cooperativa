@@ -1,0 +1,179 @@
+{% extends "AdminBundle::layout.html.twig" %}
+
+{% if entity.id  %}
+    {% set pagetitle= 'Editar datos de Perfil' %}
+    {% set urlupdate=path('seguridad_perfil_update', { 'id': entity.id }) %}
+{% else %}
+    {% set pagetitle= 'Alta de Nuevo Perfil' %}
+    {% set urlupdate=path('seguridad_perfil_create') %}
+{%endif%}
+{% block contentheader %}
+<h1> Perfiles de Usuario </h1>
+{% endblock %}
+
+{% block content %}
+<div class='row'>
+    <div class='col-md-12'>
+        <div class='box box-solid box-primary'>
+            <div class='box-header'>
+                <h3 class='box-title'> {{pagetitle}}  </h3>
+            </div><!-- /.box-header -->
+            <form action="{{urlupdate }}" method="post" role="form" {{ form_enctype(form) }}>
+                <div class='box-body pad'>
+                    {% include "AdminBundle::form-notification.html.twig" %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <fieldset>
+                                <div class="form-group col-md-6">
+                                    {{ form_row(form.nombre, { 'attr': {'class' : 'form-control' } }) }}
+                                </div>
+                                <div class="form-group col-md-6">
+                                    {{ form_row(form.admin, { 'attr': {'class' : 'form-control' } }) }}
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <h4>Permisos:</h4>
+                    <!-- MODULO SOCIOS --> 
+                    <div class="box box-warning boxModulo" id="box-socio">
+                        <div class="box-header">                            
+                            <h3 class="box-title">{{ form_widget(form.socio, { 'attr': {'class' : 'form-control checkModulo' } }) }} &nbsp;<i class="fa fa-user"></i>&nbsp; Socios <small>&nbsp; Administración de los Socios.</small></h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-warning btn-sm" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body no-padding">
+                            <fieldset>
+                                <div class="form-group col-md-2">
+                                    <i class="fa fa-angle-double-right"></i> Administración
+                                </div>
+                                <div class="form-group col-md-10">
+                                {{ form_widget(form.socioAbm, { 'attr': {'class' : 'chosen form-control',
+                                        'data-placeholder' : 'Seleccionar Permiso','multiple' : 'multiple' } }) }}
+                                </div>                                
+                            </fieldset>  
+                            <fieldset>
+                                <div class="form-group col-md-2">
+                                    <i class="fa fa-angle-double-right"></i> Estado de Deuda
+                                </div>
+                                <div class="form-group col-md-10">
+                                {{ form_widget(form.socioCtaCte, { 'attr': {'class' : 'chosen form-control',
+                                        'data-placeholder' : 'Seleccionar Permiso','multiple' : 'multiple' } }) }}
+                                </div>                                
+                            </fieldset>  
+                            <fieldset>
+                                <div class="form-group col-md-2">
+                                    <i class="fa fa-angle-double-right"></i> Empleados
+                                </div>
+                                <div class="form-group col-md-10">
+                                {{ form_widget(form.empleadoAbm, { 'attr': {'class' : 'chosen form-control',
+                                        'data-placeholder' : 'Seleccionar Permiso','multiple' : 'multiple' } }) }}
+                                </div>                                
+                            </fieldset>  
+                            <fieldset>
+                                <div class="form-group col-md-2">
+                                    <i class="fa fa-angle-double-right"></i> Vehículos
+                                </div>
+                                <div class="form-group col-md-10">
+                                {{ form_widget(form.vehiculoAbm, { 'attr': {'class' : 'chosen form-control',
+                                        'data-placeholder' : 'Seleccionar Permiso','multiple' : 'multiple' } }) }}
+                                </div>                                
+                            </fieldset>  
+                            <br>
+                        </div><!-- /.box-body -->
+                    </div><!-- /.box -->
+                    
+                    <!-- MODULO CAJA --> 
+                    <div class="box box-warning boxModulo" id="box-caja">
+                        <div class="box-header">
+                            <h3 class="box-title">{{ form_widget(form.caja, { 'attr': {'class' : 'form-control checkModulo' } }) }} &nbsp;<i class="fa fa-money"></i>&nbsp; Caja <small>&nbsp; Administración de la Caja. Registracion de ingresos y egresos.</small></h3>
+                            <!--<div class="box-tools pull-right">
+                                <button type="button" class="btn btn-warning btn-sm" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div>-->
+                        </div>
+                        <div class="box-body no-padding">                            
+                        </div><!-- /.box-body -->
+                    </div><!-- /.box -->                                        
+
+                    <!-- MODULO PARAMETROS -->
+                    <div class="box box-warning boxModulo" id="box-parametro">
+                        <div class="box-header">
+                            <h3 class="box-title">{{ form_widget(form.parametro, { 'attr': {'class' : 'form-control checkModulo' } }) }} &nbsp;<i class="fa fa-cogs"></i>&nbsp; Parámetros <small>&nbsp; Configuración de los parámetros necesarios para el funcionamiento del sistema.</small></h3>
+                            <!--<div class="box-tools pull-right">
+                                <button type="button" class="btn btn-warning btn-sm" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div>-->
+                        </div>
+                        <div class="box-body no-padding">                            
+                        </div><!-- /.box-body -->
+                    </div><!-- /.box -->
+                    
+                    <!-- MODULO SEGURIDAD -->
+                    <div class="box box-warning boxModulo" id="box-seguridad"> 
+                        <div class="box-header">                            
+                            <h3 class="box-title">{{ form_widget(form.seguridad, { 'attr': {'class' : 'form-control checkModulo' } }) }} &nbsp;<i class="fa fa-lock"></i>&nbsp; Seguridad <small>&nbsp; Administración de los Usuarios y Permisos para el acceso al sistema.</small></h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-warning btn-sm" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body no-padding">
+                            <fieldset>
+                                <div class="form-group col-md-2">
+                                    <i class="fa fa-angle-double-right"></i> Usuarios
+                                </div>
+                                <div class="form-group col-md-10">
+                                {{ form_widget(form.usuarioAbm, { 'attr': {'class' : 'chosen form-control',
+                                        'data-placeholder' : 'Seleccionar Permiso','multiple' : 'multiple' } }) }}
+                                </div>                                
+                            </fieldset>  
+                            <fieldset>
+                                <div class="form-group col-md-2">
+                                    <i class="fa fa-angle-double-right"></i> Perfiles
+                                </div>
+                                <div class="form-group col-md-10">
+                                {{ form_widget(form.perfilAbm, { 'attr': {'class' : 'chosen form-control',
+                                        'data-placeholder' : 'Seleccionar Permiso','multiple' : 'multiple' } }) }}
+                                </div>                                
+                            </fieldset>  
+                            <br>
+                        </div><!-- /.box-body -->
+                    </div><!-- /.box -->
+
+                </div>
+                <div class="box-footer">
+                    {% if entity.id  %}
+                        <a type="button" class="btn btn-app delete" href="javascript:void(0)"><i class="fa fa-trash-o"></i> Eliminar</a>
+                    {%endif%}
+                    <div class="btn-group pull-right">
+                        <button type="submit" class="btn btn-app"><i class="fa fa-save"></i> Guardar</button>
+                        <a type="button" class="btn btn-app" href="{{ path('seguridad_perfil')}}"><i class="fa fa-reply"></i> Cancelar</a>
+                    </div>
+                </div>
+                <div style="display:none;">{{ form_rest(form) }}</div>
+            </form>
+            {% if entity.id  %}
+                {{ form(delete_form) }}
+            {%endif%}
+        </div><!-- /.box -->
+    </div><!-- /.col-->
+</div><!-- ./row -->
+{% endblock %}
+{% block page_javascript %}
+<script type="text/javascript">
+    $(document).ready(function() {  
+        //setTimeout(function(){ $("[data-widget='collapse']").click(); }, 500);
+        $(".chosen").chosen();
+       /* $('.checkModulo').on('ifChecked', function(e){
+            boxModulo = $(this).parents('.boxModulo');
+            if(boxModulo.hasClass('collapsed-box'))
+                boxModulo.find("[data-widget='collapse']").click();
+        });
+        $('.checkModulo').on('ifUnchecked', function(e){
+            boxModulo = $(this).parents('.boxModulo');
+            boxModulo.find('.checkPermiso').iCheck('uncheck');
+            if(!boxModulo.hasClass('collapsed-box'))
+                boxModulo.find("[data-widget='collapse']").click();
+        });*/
+
+    });  
+</script>
+{% endblock %}

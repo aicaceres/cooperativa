@@ -1,0 +1,1147 @@
+<?php
+namespace SG\AdminBundle\Entity;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+
+/**
+ * SG\AdminBundle\Entity\Paciente
+ * @ORM\Table(name="paciente")
+ * @ORM\Entity(repositoryClass="SG\AdminBundle\Entity\PacienteRepository")
+ * @ORM\HasLifecycleCallbacks
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)  
+ */
+class Paciente
+{
+    /**
+     * @var integer $id
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    protected $id;
+
+    /**
+     * @var string $codigo
+     * @ORM\Column(name="codigo", type="string", nullable=true)
+     */
+    protected $codigo;
+
+    /**
+     * @var date $fechaIngreso
+     * @ORM\Column(name="fecha_ingreso", type="date", nullable=false)
+     * @Assert\NotBlank()
+     */
+    protected $fechaIngreso;
+
+    /**
+     * @var string $nombre
+     * @ORM\Column(name="nombre", type="string")
+     * @Assert\NotBlank()
+     */
+    protected $nombre;
+
+    /**
+     * @var string $apellido
+     * @ORM\Column(name="apellido", type="string")
+     * @Assert\NotBlank()
+     */
+    protected $apellido;
+
+    /**
+     * @var string $sexo
+     * @ORM\Column(name="sexo", type="string",length=1)
+     */
+    protected $sexo;
+
+    /**
+     * @var date $fechaNacimiento
+     * @ORM\Column(name="fecha_nacimiento", type="date", nullable=false)
+     * @Assert\NotBlank()
+     */
+    protected $fechaNacimiento;
+
+    /**
+     * @var string $nroDocumento
+     * @ORM\Column(name="nro_documento", type="string",length=15, nullable=true)
+     * @Assert\NotBlank()
+     */
+    protected $nroDocumento;
+
+    /**
+    * @ORM\ManyToOne(targetEntity="SG\ConfigBundle\Entity\ObraSocial")
+    * @ORM\JoinColumn(name="obra_social_id", referencedColumnName="id")
+    */
+    protected $obraSocial;
+
+    /**
+    * @ORM\ManyToOne(targetEntity="SG\ConfigBundle\Entity\ObraSocialPlan")
+    * @ORM\JoinColumn(name="obra_social_plan_id", referencedColumnName="id")
+    */
+    protected $obraSocialPlan;
+
+     /**
+     * @var string $nroAfiliado
+     * @ORM\Column(name="nro_afiliado", type="string",length=20, nullable=true)
+     * @Assert\NotBlank()
+     */
+    protected $nroAfiliado;
+
+    /**
+     * @var string $razonSocial
+     * @ORM\Column(name="razon_social", type="string", nullable=true)
+     * @Assert\NotBlank()
+     */
+    protected $razonSocial;
+
+    /**
+    * @ORM\ManyToOne(targetEntity="SG\ConfigBundle\Entity\SituacionImpositiva")
+    * @ORM\JoinColumn(name="situacion_impositiva_id", referencedColumnName="id")
+    */
+    protected $situacionImpositiva;
+
+    /**
+     * @var string $cuit
+     * @ORM\Column(name="cuit", type="string",length=20, nullable=true)
+     * @Assert\NotBlank()
+     */
+    protected $cuit;
+
+     /**
+     *@ORM\ManyToOne(targetEntity="SG\ConfigBundle\Entity\EstadoCivil")
+     *@ORM\JoinColumn(name="estado_civil_id", referencedColumnName="id")
+     */
+    protected $estadoCivil;
+
+    /**
+    * @ORM\ManyToOne(targetEntity="SG\ConfigBundle\Entity\Profesion")
+    * @ORM\JoinColumn(name="profesion_id", referencedColumnName="id")
+    */
+    protected $profesion;
+
+    /**
+     * @ORM\OneToOne(targetEntity="SG\AdminBundle\Entity\Domicilio", cascade={"persist", "remove"})
+     * @ORM\JoinColumn(name="domicilio_id", referencedColumnName="id")
+     */
+    protected $domicilio;
+
+    /**
+     * @ORM\OneToMany(targetEntity="SG\AdminBundle\Entity\Contacto", mappedBy="contactoPaciente",cascade={"persist", "remove"})
+     */
+    protected $contactos;
+
+    /**
+     * @ORM\OneToMany(targetEntity="SG\AdminBundle\Entity\Consulta", mappedBy="paciente",cascade={"persist", "remove"})
+     */
+    protected $consultas;
+    /**
+     * @ORM\OneToMany(targetEntity="SG\AdminBundle\Entity\Agenda", mappedBy="paciente",cascade={"persist", "remove"})
+     */
+    protected $turnos;
+    /**
+     * @ORM\OneToMany(targetEntity="SG\AdminBundle\Entity\EvaluacionPrequirurgica", mappedBy="paciente",cascade={"persist", "remove"})
+     */
+    protected $evaluacionesPrequirurgicas;
+    /**
+     * @ORM\OneToMany(targetEntity="SG\AdminBundle\Entity\EncuestaSalud", mappedBy="paciente",cascade={"persist", "remove"})
+     */
+    protected $encuestasSalud;
+    /**
+     * @ORM\OneToMany(targetEntity="SG\AdminBundle\Entity\EstudiosComplementarios", mappedBy="paciente",cascade={"persist", "remove"})
+     */
+    protected $estudiosComplementarios;
+    
+    /**
+     * @ORM\OneToMany(targetEntity="SG\AdminBundle\Entity\Internacion", mappedBy="paciente",cascade={"persist", "remove"})
+     */
+    protected $internaciones;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="SG\ConfigBundle\Entity\Sucursal")
+     * @ORM\JoinTable(name="sucursales_x_paciente",
+     *      joinColumns={@ORM\JoinColumn(name="paciente_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="sucursal_id", referencedColumnName="id")}
+     * )
+     */
+    private $sucursales;
+
+    /**
+     * @ORM\Column(name="activo", type="boolean")
+     */
+    protected $activo = true;
+
+    /**
+     * @ORM\Column(name="deletedAt", type="datetime", nullable=true)
+     */
+    private $deletedAt;    
+    /**
+     * @var datetime $created
+     * @Gedmo\Timestampable(on="create")
+     * @ORM\Column(type="datetime")
+     */
+    private $created;
+    /**
+     * @var User $createdBy
+     * @Gedmo\Blameable(on="create")
+     * @ORM\ManyToOne(targetEntity="SG\ConfigBundle\Entity\Usuario")
+     * @ORM\JoinColumn(name="created_by", referencedColumnName="id")
+     */
+    private $createdBy;
+    /**
+     * @var datetime $updated
+     * @Gedmo\Timestampable(on="update")
+     * @ORM\Column(type="datetime")
+     */
+    private $updated;
+    /**
+     * @var User $updatedBy
+     * @Gedmo\Blameable(on="update")
+     * @ORM\ManyToOne(targetEntity="SG\ConfigBundle\Entity\Usuario")
+     * @ORM\JoinColumn(name="updated_by", referencedColumnName="id")
+     */
+    private $updatedBy;  
+    
+    /*
+     * Funciones personalizadas
+     */    
+    public function slug(){
+        $paciente = $this->nombre.' '.$this->apellido;
+        return strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $paciente )));
+    }
+
+    public function __toString() {
+       return $this->apellido.', '.$this->nombre;
+    }
+
+    public function estaInternado(){
+        foreach ($this->getInternaciones() as $internacion) {
+            if($internacion->getEstado()=='I')
+                return true;
+        }
+        return false;
+    }
+    public function getNombreCompleto(){
+        return $this->apellido.', '.$this->nombre;
+    }    
+    public function getNombreCompletoDni(){        
+        return $this->apellido.', '.$this->nombre.' (DNI '.$this->nroDocumento.')';
+    }    
+    /*
+    * Calcula la edad
+    */
+    public function getEdad(){
+        list($Y,$m,$d) = explode("-", $this->fechaNacimiento->format("Y-m-d") );
+        $edad = ( date("md") < $m.$d ? date("Y")-$Y-1 : date("Y")-$Y );
+        return $edad;
+    }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->contactos = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->consultas = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->evaluacionesPrequirurgicas = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->encuestasSalud = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->estudiosComplementarios = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->internaciones = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->sucursales = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Get id
+     *
+     * @return integer 
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set codigo
+     *
+     * @param string $codigo
+     * @return Paciente
+     */
+    public function setCodigo($codigo)
+    {
+        $this->codigo = $codigo;
+
+        return $this;
+    }
+
+    /**
+     * Get codigo
+     *
+     * @return string 
+     */
+    public function getCodigo()
+    {
+        return $this->codigo;
+    }
+
+    /**
+     * Set fechaIngreso
+     *
+     * @param \DateTime $fechaIngreso
+     * @return Paciente
+     */
+    public function setFechaIngreso($fechaIngreso)
+    {
+        $this->fechaIngreso = $fechaIngreso;
+
+        return $this;
+    }
+
+    /**
+     * Get fechaIngreso
+     *
+     * @return \DateTime 
+     */
+    public function getFechaIngreso()
+    {
+        return $this->fechaIngreso;
+    }
+
+    /**
+     * Set nombre
+     *
+     * @param string $nombre
+     * @return Paciente
+     */
+    public function setNombre($nombre)
+    {
+        $this->nombre = $nombre;
+
+        return $this;
+    }
+
+    /**
+     * Get nombre
+     *
+     * @return string 
+     */
+    public function getNombre()
+    {
+        return $this->nombre;
+    }
+
+    /**
+     * Set apellido
+     *
+     * @param string $apellido
+     * @return Paciente
+     */
+    public function setApellido($apellido)
+    {
+        $this->apellido = $apellido;
+
+        return $this;
+    }
+
+    /**
+     * Get apellido
+     *
+     * @return string 
+     */
+    public function getApellido()
+    {
+        return $this->apellido;
+    }
+
+    /**
+     * Set sexo
+     *
+     * @param string $sexo
+     * @return Paciente
+     */
+    public function setSexo($sexo)
+    {
+        $this->sexo = $sexo;
+
+        return $this;
+    }
+
+    /**
+     * Get sexo
+     *
+     * @return string 
+     */
+    public function getSexo()
+    {
+        return $this->sexo;
+    }
+
+    /**
+     * Set fechaNacimiento
+     *
+     * @param \DateTime $fechaNacimiento
+     * @return Paciente
+     */
+    public function setFechaNacimiento($fechaNacimiento)
+    {
+        $this->fechaNacimiento = $fechaNacimiento;
+
+        return $this;
+    }
+
+    /**
+     * Get fechaNacimiento
+     *
+     * @return \DateTime 
+     */
+    public function getFechaNacimiento()
+    {
+        return $this->fechaNacimiento;
+    }
+
+    /**
+     * Set nroDocumento
+     *
+     * @param string $nroDocumento
+     * @return Paciente
+     */
+    public function setNroDocumento($nroDocumento)
+    {
+        $this->nroDocumento = $nroDocumento;
+
+        return $this;
+    }
+
+    /**
+     * Get nroDocumento
+     *
+     * @return string 
+     */
+    public function getNroDocumento()
+    {
+        return $this->nroDocumento;
+    }
+
+    /**
+     * Set nroAfiliado
+     *
+     * @param string $nroAfiliado
+     * @return Paciente
+     */
+    public function setNroAfiliado($nroAfiliado)
+    {
+        $this->nroAfiliado = $nroAfiliado;
+
+        return $this;
+    }
+
+    /**
+     * Get nroAfiliado
+     *
+     * @return string 
+     */
+    public function getNroAfiliado()
+    {
+        return $this->nroAfiliado;
+    }
+
+    /**
+     * Set razonSocial
+     *
+     * @param string $razonSocial
+     * @return Paciente
+     */
+    public function setRazonSocial($razonSocial)
+    {
+        $this->razonSocial = $razonSocial;
+
+        return $this;
+    }
+
+    /**
+     * Get razonSocial
+     *
+     * @return string 
+     */
+    public function getRazonSocial()
+    {
+        return $this->razonSocial;
+    }
+
+    /**
+     * Set cuit
+     *
+     * @param string $cuit
+     * @return Paciente
+     */
+    public function setCuit($cuit)
+    {
+        $this->cuit = $cuit;
+
+        return $this;
+    }
+
+    /**
+     * Get cuit
+     *
+     * @return string 
+     */
+    public function getCuit()
+    {
+        return $this->cuit;
+    }
+
+    /**
+     * Set activo
+     *
+     * @param boolean $activo
+     * @return Paciente
+     */
+    public function setActivo($activo)
+    {
+        $this->activo = $activo;
+
+        return $this;
+    }
+
+    /**
+     * Get activo
+     *
+     * @return boolean 
+     */
+    public function getActivo()
+    {
+        return $this->activo;
+    }
+
+    /**
+     * Set created
+     *
+     * @param \DateTime $created
+     * @return Paciente
+     */
+    public function setCreated($created)
+    {
+        $this->created = $created;
+
+        return $this;
+    }
+
+    /**
+     * Get created
+     *
+     * @return \DateTime 
+     */
+    public function getCreated()
+    {
+        return $this->created;
+    }
+
+    /**
+     * Set obraSocial
+     *
+     * @param \SG\ConfigBundle\Entity\ObraSocial $obraSocial
+     * @return Paciente
+     */
+    public function setObraSocial(\SG\ConfigBundle\Entity\ObraSocial $obraSocial = null)
+    {
+        $this->obraSocial = $obraSocial;
+
+        return $this;
+    }
+
+    /**
+     * Get obraSocial
+     *
+     * @return \SG\ConfigBundle\Entity\ObraSocial 
+     */
+    public function getObraSocial()
+    {
+        return $this->obraSocial;
+    }
+
+    /**
+     * Set obraSocialPlan
+     *
+     * @param \SG\ConfigBundle\Entity\ObraSocialPlan $obraSocialPlan
+     * @return Paciente
+     */
+    public function setObraSocialPlan(\SG\ConfigBundle\Entity\ObraSocialPlan $obraSocialPlan = null)
+    {
+        $this->obraSocialPlan = $obraSocialPlan;
+
+        return $this;
+    }
+
+    /**
+     * Get obraSocialPlan
+     *
+     * @return \SG\ConfigBundle\Entity\ObraSocialPlan 
+     */
+    public function getObraSocialPlan()
+    {
+        return $this->obraSocialPlan;
+    }
+
+    /**
+     * Set situacionImpositiva
+     *
+     * @param \SG\ConfigBundle\Entity\SituacionImpositiva $situacionImpositiva
+     * @return Paciente
+     */
+    public function setSituacionImpositiva(\SG\ConfigBundle\Entity\SituacionImpositiva $situacionImpositiva = null)
+    {
+        $this->situacionImpositiva = $situacionImpositiva;
+
+        return $this;
+    }
+
+    /**
+     * Get situacionImpositiva
+     *
+     * @return \SG\ConfigBundle\Entity\SituacionImpositiva 
+     */
+    public function getSituacionImpositiva()
+    {
+        return $this->situacionImpositiva;
+    }
+
+    /**
+     * Set estadoCivil
+     *
+     * @param \SG\ConfigBundle\Entity\EstadoCivil $estadoCivil
+     * @return Paciente
+     */
+    public function setEstadoCivil(\SG\ConfigBundle\Entity\EstadoCivil $estadoCivil = null)
+    {
+        $this->estadoCivil = $estadoCivil;
+
+        return $this;
+    }
+
+    /**
+     * Get estadoCivil
+     *
+     * @return \SG\ConfigBundle\Entity\EstadoCivil 
+     */
+    public function getEstadoCivil()
+    {
+        return $this->estadoCivil;
+    }
+
+    /**
+     * Set profesion
+     *
+     * @param \SG\ConfigBundle\Entity\Profesion $profesion
+     * @return Paciente
+     */
+    public function setProfesion(\SG\ConfigBundle\Entity\Profesion $profesion = null)
+    {
+        $this->profesion = $profesion;
+
+        return $this;
+    }
+
+    /**
+     * Get profesion
+     *
+     * @return \SG\ConfigBundle\Entity\Profesion 
+     */
+    public function getProfesion()
+    {
+        return $this->profesion;
+    }
+
+    /**
+     * Set domicilio
+     *
+     * @param \SG\AdminBundle\Entity\Domicilio $domicilio
+     * @return Paciente
+     */
+    public function setDomicilio(\SG\AdminBundle\Entity\Domicilio $domicilio = null)
+    {
+        $this->domicilio = $domicilio;
+
+        return $this;
+    }
+
+    /**
+     * Get domicilio
+     *
+     * @return \SG\AdminBundle\Entity\Domicilio 
+     */
+    public function getDomicilio()
+    {
+        return $this->domicilio;
+    }
+
+    /**
+     * Add contactos
+     *
+     * @param \SG\AdminBundle\Entity\Contacto $contactos
+     * @return Paciente
+     */
+    public function addContacto(\SG\AdminBundle\Entity\Contacto $contactos)
+    {
+        $contactos->setContactoPaciente($this);
+        $this->contactos[] = $contactos;
+        return $this;
+    }
+
+    /**
+     * Remove contactos
+     *
+     * @param \SG\AdminBundle\Entity\Contacto $contactos
+     */
+    public function removeContacto(\SG\AdminBundle\Entity\Contacto $contactos)
+    {
+        $this->contactos->removeElement($contactos);
+    }
+
+    /**
+     * Get contactos
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getContactos()
+    {
+        return $this->contactos;
+    }
+
+    /**
+     * Add consultas
+     *
+     * @param \SG\AdminBundle\Entity\Consulta $consultas
+     * @return Paciente
+     */
+    public function addConsulta(\SG\AdminBundle\Entity\Consulta $consultas)
+    {
+        $consultas->setPaciente($this);
+        $this->consultas[] = $consultas;
+        return $this;
+    }
+
+    /**
+     * Remove consultas
+     *
+     * @param \SG\AdminBundle\Entity\Consulta $consultas
+     */
+    public function removeConsulta(\SG\AdminBundle\Entity\Consulta $consultas)
+    {
+        $this->consultas->removeElement($consultas);
+    }
+
+    /**
+     * Get consultas
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getConsultas()
+    {
+        return $this->consultas;
+    }
+
+    /**
+     * Add evaluacionesPrequirurgicas
+     *
+     * @param \SG\AdminBundle\Entity\EvaluacionPrequirurgica $evaluacionesPrequirurgicas
+     * @return Paciente
+     */
+    public function addEvaluacionesPrequirurgica(\SG\AdminBundle\Entity\EvaluacionPrequirurgica $evaluacionesPrequirurgicas)
+    {
+        $evaluacionesPrequirurgicas->setPaciente($this);
+        $this->evaluacionesPrequirurgicas[] = $evaluacionesPrequirurgicas;
+        return $this;
+    }
+
+    /**
+     * Remove evaluacionesPrequirurgicas
+     *
+     * @param \SG\AdminBundle\Entity\EvaluacionPrequirurgica $evaluacionesPrequirurgicas
+     */
+    public function removeEvaluacionesPrequirurgica(\SG\AdminBundle\Entity\EvaluacionPrequirurgica $evaluacionesPrequirurgicas)
+    {
+        $this->evaluacionesPrequirurgicas->removeElement($evaluacionesPrequirurgicas);
+    }
+
+    /**
+     * Get evaluacionesPrequirurgicas
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getEvaluacionesPrequirurgicas()
+    {
+        return $this->evaluacionesPrequirurgicas;
+    }
+
+    /**
+     * Add encuestasSalud
+     *
+     * @param \SG\AdminBundle\Entity\EncuestaSalud $encuestasSalud
+     * @return Paciente
+     */
+    public function addEncuestasSalud(\SG\AdminBundle\Entity\EncuestaSalud $encuestasSalud)
+    {
+        $encuestasSalud->setPaciente($this);
+        $this->encuestasSalud[] = $encuestasSalud;
+        return $this;
+    }
+
+    /**
+     * Remove encuestasSalud
+     *
+     * @param \SG\AdminBundle\Entity\EncuestaSalud $encuestasSalud
+     */
+    public function removeEncuestasSalud(\SG\AdminBundle\Entity\EncuestaSalud $encuestasSalud)
+    {
+        $this->encuestasSalud->removeElement($encuestasSalud);
+    }
+
+    /**
+     * Get encuestasSalud
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getEncuestasSalud()
+    {
+        return $this->encuestasSalud;
+    }
+
+    /**
+     * Add estudiosComplementarios
+     *
+     * @param \SG\AdminBundle\Entity\EstudiosComplementarios $estudiosComplementarios
+     * @return Paciente
+     */
+    public function addEstudiosComplementario(\SG\AdminBundle\Entity\EstudiosComplementarios $estudiosComplementarios)
+    {
+        $estudiosComplementarios->setPaciente($this);
+        $this->estudiosComplementarios[] = $estudiosComplementarios;
+        return $this;
+    }
+
+    /**
+     * Remove estudiosComplementarios
+     *
+     * @param \SG\AdminBundle\Entity\EstudiosComplementarios $estudiosComplementarios
+     */
+    public function removeEstudiosComplementario(\SG\AdminBundle\Entity\EstudiosComplementarios $estudiosComplementarios)
+    {
+        $this->estudiosComplementarios->removeElement($estudiosComplementarios);
+    }
+
+    /**
+     * Get estudiosComplementarios
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getEstudiosComplementarios()
+    {
+        return $this->estudiosComplementarios;
+    }
+
+    /**
+     * Add internaciones
+     *
+     * @param \SG\AdminBundle\Entity\Internacion $internaciones
+     * @return Paciente
+     */
+    public function addInternacione(\SG\AdminBundle\Entity\Internacion $internaciones)
+    {
+        $this->internaciones[] = $internaciones;
+
+        return $this;
+    }
+
+    /**
+     * Remove internaciones
+     *
+     * @param \SG\AdminBundle\Entity\Internacion $internaciones
+     */
+    public function removeInternacione(\SG\AdminBundle\Entity\Internacion $internaciones)
+    {
+        $this->internaciones->removeElement($internaciones);
+    }
+
+    /**
+     * Get internaciones
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getInternaciones()
+    {
+        return $this->internaciones;
+    }
+
+    /**
+     * Add sucursales
+     *
+     * @param \SG\ConfigBundle\Entity\Sucursal $sucursales
+     * @return Paciente
+     */
+    public function addSucursale(\SG\ConfigBundle\Entity\Sucursal $sucursales)
+    {
+        $this->sucursales[] = $sucursales;
+
+        return $this;
+    }
+
+    /**
+     * Remove sucursales
+     *
+     * @param \SG\ConfigBundle\Entity\Sucursal $sucursales
+     */
+    public function removeSucursale(\SG\ConfigBundle\Entity\Sucursal $sucursales)
+    {
+        $this->sucursales->removeElement($sucursales);
+    }
+
+    /**
+     * Get sucursales
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getSucursales()
+    {
+        return $this->sucursales;
+    }
+
+    /**
+     * Set createdBy
+     *
+     * @param \SG\ConfigBundle\Entity\Usuario $createdBy
+     * @return Paciente
+     */
+    public function setCreatedBy(\SG\ConfigBundle\Entity\Usuario $createdBy = null)
+    {
+        $this->createdBy = $createdBy;
+
+        return $this;
+    }
+
+    /**
+     * Get createdBy
+     *
+     * @return \SG\ConfigBundle\Entity\Usuario 
+     */
+    public function getCreatedBy()
+    {
+        return $this->createdBy;
+    }
+    
+ /**
+ * MANEJO DE FOTO
+ */
+    /**
+     * @ORM\Column(name="path", type="string", length=255, nullable=true)
+     */
+    protected $path;
+
+    /**
+     * Set path
+     * @param string $path
+     * @return paciente
+     */
+    public function setPath($path)
+    {
+        $this->path = $path;
+        return $this;
+    }
+
+    /**
+     * Get path
+     * @return string
+     */
+    public function getPath()
+    {
+        return $this->path;
+    }
+
+    public function getAbsolutePath()
+    {
+        return null === $this->path
+            ? null
+            : $this->getUploadRootDir().'/'.$this->path;
+    }
+
+    public function getWebPath()
+    {
+        return null === $this->path
+            ? null
+            : $this->getUploadDir().'/'.$this->path;
+    }
+
+    protected function getUploadRootDir()
+    {
+        // la ruta absoluta del directorio donde se deben
+        // guardar los archivos cargados
+        return __DIR__.'/../../../../web/'.$this->getUploadDir();
+    }
+
+    protected function getUploadDir()
+    {
+        // se deshace del __DIR__ para no meter la pata
+        // al mostrar el documento/imagen cargada en la vista.
+        return 'uploads';
+    } 
+
+    /**
+     * @Assert\File(maxSize="2M", mimeTypes={"image/jpeg", "image/pjpeg", "image/png", "image/x-png"}, 
+     *              mimeTypesMessage="El tipo de imagen no es válido. Debe ser .png o .jpg") 
+     */
+    private $file;
+    private $filenameForRemove;
+    /**
+     * Get file.
+     * @return UploadedFile
+     */
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    private $temp;
+
+    /**
+     * Sets file.
+     * @param UploadedFile $file
+     */
+    public function setFile(UploadedFile $file = null)
+    {
+        $this->file = $file;
+        // check if we have an old image path
+        if (isset($this->path)) {
+            // store the old name to delete after the update
+            $this->temp = $this->path;
+            $this->path = null;
+        } else {
+            $this->path = 'initial';
+        }
+    }
+
+    /**
+     * @ORM\PrePersist()
+     * @ORM\PreUpdate()
+     */
+    public function preUpload()
+    {
+        if (null !== $this->getFile()) {
+            // haz lo que quieras para generar un nombre único
+            $filename = sha1(uniqid(mt_rand(), true));
+            $this->path = $filename.'.'.$this->getFile()->guessExtension();
+        }
+    }
+
+    /**
+     * @ORM\PostPersist()
+     * @ORM\PostUpdate()
+     */
+    public function upload()
+    {
+        if (null === $this->getFile()) {
+            return;
+        }
+        // si hay un error al mover el archivo, move() automáticamente
+        // envía una excepción. This will properly prevent
+        // the entity from being persisted to the database on error
+        $this->getFile()->move($this->getUploadRootDir(), $this->path);
+
+        // check if we have an old image
+        if (isset($this->temp)) {
+            // delete the old image
+            unlink($this->getUploadRootDir().'/'.$this->temp);
+            // clear the temp image path
+            $this->temp = null;
+        }
+        $this->file = null;
+    }
+    /**
+     * @ORM\PreRemove()
+     */
+    public function storeFilenameForRemove()
+    {
+        $this->filenameForRemove = $this->getAbsolutePath();
+    }
+
+    /**
+     * @ORM\PostRemove()
+     */
+    public function removeUpload()
+    {
+        if ($this->filenameForRemove) {
+            unlink($this->filenameForRemove);
+        }
+    }
+
+    /*
+    * FIN MANEJO DE FOTO
+    */    
+
+    /**
+     * Set deletedAt
+     *
+     * @param \DateTime $deletedAt
+     * @return Paciente
+     */
+    public function setDeletedAt($deletedAt)
+    {
+        $this->deletedAt = $deletedAt;
+
+        return $this;
+    }
+
+    /**
+     * Get deletedAt
+     *
+     * @return \DateTime 
+     */
+    public function getDeletedAt()
+    {
+        return $this->deletedAt;
+    }
+
+    /**
+     * Set updated
+     *
+     * @param \DateTime $updated
+     * @return Paciente
+     */
+    public function setUpdated($updated)
+    {
+        $this->updated = $updated;
+
+        return $this;
+    }
+
+    /**
+     * Get updated
+     *
+     * @return \DateTime 
+     */
+    public function getUpdated()
+    {
+        return $this->updated;
+    }
+
+    /**
+     * Set updatedBy
+     *
+     * @param \SG\ConfigBundle\Entity\Usuario $updatedBy
+     * @return Paciente
+     */
+    public function setUpdatedBy(\SG\ConfigBundle\Entity\Usuario $updatedBy = null)
+    {
+        $this->updatedBy = $updatedBy;
+
+        return $this;
+    }
+
+    /**
+     * Get updatedBy
+     *
+     * @return \SG\ConfigBundle\Entity\Usuario 
+     */
+    public function getUpdatedBy()
+    {
+        return $this->updatedBy;
+    }
+
+}

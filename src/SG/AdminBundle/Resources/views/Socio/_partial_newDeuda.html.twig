@@ -1,0 +1,168 @@
+{% block content %}
+<form id="deudaForm">
+    <h5 class="btn bg-blue btn-flat" style="width:100%;text-align:center;margin:0 0 10px">{{entity.socio.nombreCompleto}}</h5>
+    <input type="hidden" value="{{tipo}}" name="tipo">
+    <fieldset>        
+        <div class="form-group col-md-6">
+            {{ form_row(form.concepto, { 'attr': {'class' : 'chosen form-control'} }) }}
+        </div>        
+    </fieldset>  
+    {% if tipo == 'deuda' %}
+        <!-- GENERAR CONCEPTO -->        
+    <fieldset>
+        <div class="form-group col-md-4">
+            {{ form_label(form.fechaVto) }}
+            <div class="input-group">
+                <div class="input-group-addon">
+                    <i class="fa fa-calendar"></i>
+                </div>
+                {{ form_widget(form.fechaVto, { 'attr': {'class' : 'form-control' } }) }}
+            </div><!-- /.input group -->
+            {{ form_errors(form.fechaVto) }}
+        </div>
+        <div class="form-group col-md-4">
+            {{ form_label(form.monto) }}
+            <div class="input-group">
+                <div class="input-group-addon">
+                    <i class="fa fa-dollar"></i>
+                </div>
+                {{ form_widget(form.monto, { 'attr': {'class' : 'form-control' } }) }}
+            </div><!-- /.input group -->
+            {{ form_errors(form.monto) }}
+        </div>
+    </fieldset>        
+    
+        
+    {% else %} 
+        <!-- GENERAR CUOTAS -->
+      
+    <fieldset>           
+        <div class="form-group col-md-4">
+            {{ form_label(form.fechaVto) }}
+            <div class="input-group">
+                <div class="input-group-addon">
+                    <i class="fa fa-calendar"></i>
+                </div>
+                {{ form_widget(form.fechaVto, { 'attr': {'class' : 'form-control' } }) }}
+            </div><!-- /.input group -->
+            {{ form_errors(form.fechaVto) }}
+        </div>
+        <div class="form-group col-md-4">
+            {{ form_label(form.monto) }}
+            <div class="input-group">
+                <div class="input-group-addon">
+                    <i class="fa fa-dollar"></i>
+                </div>
+                {{ form_widget(form.monto, { 'attr': {'class' : 'form-control' } }) }}
+            </div><!-- /.input group -->
+            {{ form_errors(form.monto) }}
+        </div>
+        <div class="form-group col-md-4">
+            {{ form_row(form.cantidadCuotas, { 'attr': {'class' : 'form-control' } }) }}
+        </div>          
+    </fieldset>   
+    <fieldset id="cuotas-text" class="hidden">
+        <div class="col-md-12">
+            <p class="text-info ">
+                <i class="fa fa-info-circle" ></i> <small>El vencimiento de las cuotas subsiguientes se generará automáticamente en forma mensual a partir de la fecha de primer vencimiento aquí indicada.</small>
+            </p>
+        </div>
+    </fieldset>   
+        
+    {% endif %}   
+    
+    <fieldset>
+        <div class="form-group col-md-12">
+            {{ form_row(form.descripcion, { 'attr': {'class' : 'form-control'} }) }}
+        </div>
+    </fieldset>  
+    
+    <div class="modal-footer" style="padding:10px 20px 0px;">
+        <div class="btn-group pull-right">
+            <button type="button" class="btn btn-app" id="addNewDeuda"><i class="fa fa-save"></i> Guardar</button>
+            <button type="button" class="btn btn-app" id="cancelNewDeuda"><i class="fa fa-reply"></i> Cancelar</button>
+        </div>
+    </div>
+            <div style="display:none">{{ form_rest(form) }}</div>
+</form>
+        
+{% endblock %}
+
+{% block page_javascript %}
+<script src="{{ asset('assets/js/app.js') }}" type="text/javascript"></script>        
+<script type="text/javascript">
+$(document).ready(function () {    
+    $(".chosen").chosen();   
+    $('#sg_adminbundle_deuda_fechaVto').datepicker().on('hide', function(e) {
+        e.stopPropagation();
+    });
+    $('#sg_adminbundle_deuda_cantidadCuotas').on('change',function(){
+        if( $(this).val()==1 )
+            $('#cuotas-text').addClass('hidden');
+        
+        if( $(this).val()>1 )
+            $('#cuotas-text').removeClass('hidden');
+        
+        if( $(this).val()<1 ){
+            alert('Debe indicar al menos una cuota');
+            $(this).val(1);
+        }
+    });
+    
+    $('#cancelNewDeuda').on('click',function(){
+        $('#deuda-modal').modal('hide');
+    });
+    $('#sg_adminbundle_deuda_concepto').on('change',function(){ 
+        if( $(this).val() ){
+            $.get('{{ path('get_monto_concepto_caja') }}', { conceptoId: $(this).val() }, function (data) {
+                if(data>0)
+                    $('#sg_adminbundle_deuda_monto').val(data);          
+            }, "json");
+        }
+    });
+   /* $('#sg_adminbundle_deuda_anual').on('ifChecked', function(e){
+                $('.periodo').hide();   
+                $('.anioAnual').show();  
+                $('#sg_adminbundle_deuda_descripcion').focus();
+            });
+    $('#sg_adminbundle_deuda_anual').on('ifUnchecked', function(e){
+                $('.periodo').show();  
+                $('.anioAnual').hide();
+            });
+*/
+    
+    $('#addNewDeuda').on('click',function(){  
+        monto  = parseFloat($('#sg_adminbundle_deuda_monto').val());
+        $('#sg_adminbundle_deuda_monto').val( ( isNaN(monto) || monto==0 )?'':monto );
+
+        var sel = $('select:required:invalid').attr('id');
+        if(sel){
+            $('#'+sel+'_chosen').find('input').focus();
+            return false;
+        }
+        var invalid = $('input:required:invalid');
+        if(invalid.length>0){
+            $('input:required:invalid').focus();                
+            alert('Debe completar todos los datos requeridos.');
+            return false;
+        }
+        
+        $.ajax({
+            url: '{{path('socio_create_deuda')}}',
+            dataType: 'json',
+            type: "POST",
+            data: $('#deudaForm').serialize(),
+            success: function(data){
+                if (data = 'OK') {
+                    alert('Se ha generado el nuevo concepto.');                    
+                    mostrarDatos();
+                } else{
+                    alert('No se ha podido generar el concepto.')
+                }
+                $('#deuda-modal').modal('hide');
+            }
+        });
+    });
+});
+</script>    
+{% endblock %}

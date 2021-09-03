@@ -1,0 +1,71 @@
+caja_movimiento:
+    path:     /movimiento
+    defaults: { _controller: "AdminBundle:Caja:movimiento" }
+
+caja_aperturacierre:
+    pattern:  /aperturacierre
+    defaults: { _controller: "AdminBundle:Caja:aperturaCierre" }
+    
+caja_aperturacierre_apertura:
+    pattern: /apertura
+    defaults: { _controller: "AdminBundle:Caja:apertura" }   
+    
+caja_apertura_create:
+    pattern:  /apertura/create
+    defaults: { _controller: "AdminBundle:Caja:aperturaCreate" }
+    requirements: { _method: post }    
+
+caja_apertura_update:
+    pattern:  /apertura/{id}/update
+    defaults: { _controller: "AdminBundle:Caja:aperturaUpdate" }
+    requirements: { _method: post|put }
+    
+caja_aperturacierre_cierre:
+    pattern: /{id}/cierre
+    defaults: { _controller: "AdminBundle:Caja:cierre" }
+    
+caja_aperturacierre_informecierre:
+    pattern: /{id}/informeCierre
+    defaults: { _controller: "AdminBundle:Caja:informeCierre" } 
+    
+caja_movimiento_delete:
+    pattern:  /{id}/deleteMovimiento
+    defaults: { _controller: "AdminBundle:Caja:deleteMovimiento" }
+    requirements: { _method: post|delete }
+    
+caja_movimiento_add:
+    pattern: /{apId}/{tipo}/movimientoadd
+    defaults: { _controller: "AdminBundle:Caja:movimientoAdd" }
+caja_movimiento_addegreso:
+    pattern: /{apId}/addegreso
+    defaults: { _controller: "AdminBundle:Caja:egresoAdd" }
+    
+caja_movimiento_create:
+    pattern:  /movimientoCreate
+    defaults: { _controller: "AdminBundle:Caja:movimientoCreate" }
+    requirements: { _method: post }   
+    
+caja_liquidacion_create:
+    pattern:  /liquidacionCreate
+    defaults: { _controller: "AdminBundle:Caja:liquidacionCreate" }
+    requirements: { _method: post }     
+    
+caja_movimiento_getDetalle:
+    pattern: /getDetalleMovimiento
+    defaults: { _controller: "AdminBundle:Caja:getDetalleMovimiento" }    
+    
+caja_print_movimiento:
+    path: /{id}/printMovimiento.{_format}
+    defaults: { _controller: "AdminBundle:Caja:printMovimiento", _format: 'pdf' }  
+    
+caja_print_cierre:
+    path: /{id}/printCierre.{_format}
+    defaults: { _controller: "AdminBundle:Caja:printCierre", _format: 'pdf' }    
+    
+caja_informes:
+    path: /informes
+    defaults: { _controller: "AdminBundle:Caja:informes" }   
+    
+caja_print_informe:
+    path: /printInforme.{_format}
+    defaults: { _controller: "AdminBundle:Caja:printInforme", _format: 'pdf' }       

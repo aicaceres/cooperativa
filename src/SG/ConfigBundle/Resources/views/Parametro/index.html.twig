@@ -1,0 +1,53 @@
+{% extends "AdminBundle::layout.html.twig" %}
+{% set table = app.request.attributes.get('table') %}
+
+{% block content %}
+<div class='row'>
+    <div class='col-md-12'>
+        <div class="box box-solid">
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-md-3 col-sm-4">
+                        <div class="box-header">
+                            <i class="fa fa-cogs"></i>
+                            <h3 class="box-title">Parámetros</h3>
+                        </div>
+                        <!-- Navigation - folders-->
+                        <div style="margin-top: 15px;">
+                            <ul class="nav nav-pills nav-stacked" id="tab-parametro">
+                                <li><a href="{{ path('parametro',{ 'table': 'Empresa' }) }}"><i class="fa fa-cog"></i> Empresas </a></li>
+                                <li><a href="{{ path('parametro',{ 'table': 'ConceptoCaja' }) }}"><i class="fa fa-cog"></i> Conceptos de Caja </a></li>
+                                <li><a href="{{ path('parametro',{ 'table': 'Configuracion' }) }}"><i class="fa fa-cog"></i> Configuración </a></li>
+                            </ul>
+                        </div>
+                    </div><!-- /.col (LEFT) -->
+                    <div class="col-md-9 col-sm-8">
+
+                        <div class='box box-solid box-primary'>
+                            <div class='box-header'>
+                                <h3 class='box-title'>{{title}}</h3>
+                            </div><!-- /.box-header -->
+                            <div class='box-body pad'>
+                                {% include "AdminBundle::form-notification.html.twig" %}
+                                <div class="box-body table-responsive">
+                                        <!-- content -->
+                                </div>
+                            </div>
+                        </div><!-- /.box -->
+                    </div><!-- /.col (RIGHT) -->
+                </div><!-- /.row -->
+            </div><!-- /.box-body -->
+        </div><!-- /.box -->
+    </div><!-- /.col-->
+</div><!-- ./row -->
+{% endblock %}
+
+{% block page_javascript %}
+<script type="text/javascript">
+$(document).ready(function() {
+    $('.table-responsive').html({{ html|raw }});
+    $('.nav-pills a[href$="' + "{{ table }}" + '"]').parent('li').addClass('active');
+});
+</script>
+<script src="{{ asset('assets/js/tables.js') }}" type="text/javascript"></script>
+{% endblock %}

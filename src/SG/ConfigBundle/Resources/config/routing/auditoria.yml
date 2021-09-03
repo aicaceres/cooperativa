@@ -1,0 +1,3 @@
+seguridad_auditoria:
+    pattern:  /
+    defaults: { _controller: "ConfigBundle:Auditoria:index" }

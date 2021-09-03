@@ -1,0 +1,30 @@
+{{ form_errors(form.domicilios) }}
+<div data-index="{{form.domicilios | length }}" class="collectionHolder" 
+     data-prototype="{% filter escape %}{% include 'AdminBundle:Domicilio:prototype.html.twig' with {'item':form.domicilios.vars.prototype} %}{% endfilter %}">
+    {% for item in form.domicilios %}
+        <fieldset>
+            <div class="col-md-5">
+                <div class="form-group">
+                    {{ form_row(item.direccion, { 'attr': {'class' : 'form-control' } }) }}
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    {{ form_row(item.localidad, { 'attr': {'class' : 'chosen form-control' } }) }}
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    {{ form_row(item.telefono, { 'attr': {'class' : 'form-control' } }) }}
+                </div>
+            </div>
+            <div class="form-group col-md-1 form-actions" style="margin-top: 20px;">&nbsp;</div>
+        </fieldset>
+    {% endfor %}
+</div>
+<div class='row'>
+    <div class='col-md-12' style="text-align:center;">
+        <a href="javascript:void(0)" class="btn btn-warning btn-xs linkAdd" title="Agregar Domicilio" data-form="domicilios" data-toggle="tooltip"><i class="fa fa-plus"></i>&nbsp; Agregar</a>
+    </div>
+</div>
+<br>

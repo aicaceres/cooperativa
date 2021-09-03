@@ -1,0 +1,35 @@
+<table class="table table-bordered table-hover tablelist">
+    <thead>
+        <tr>                                
+            <th>#</th>
+            <th>Dominio</th>
+            <th>Marca</th>                                
+            <th>Modelo</th>                                
+            <th>Año</th>
+            <th>Líneas</th>
+            <th>Carga</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for vehiculo in vehiculos %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ vehiculo.dominio }}</td>
+                <td>{{ vehiculo.marca }}</td>
+                <td>{{ vehiculo.modelo }}</td>
+                <td>{{ vehiculo.anio }}</td>
+                <td>{{ vehiculo.lineasHtml|raw }}</td>
+                <td>{{ vehiculo.carga }}</td>                
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+    
+<script type="text/javascript">    
+$(document).ready(function() {
+    $('.modal-title').text('Vehículos asignados');
+     $(".btn-success").hide();  
+     $(".btn-danger").text('Cerrar');       
+});    
+</script>    
+

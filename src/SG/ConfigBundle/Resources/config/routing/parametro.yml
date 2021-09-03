@@ -1,0 +1,41 @@
+parametro_render_add:
+    pattern: /renderAddParametro
+    defaults: { _controller: "ConfigBundle:Parametro:renderAddParametro"}
+parametro_create_ajax:
+    pattern:  /ajax/create/{table}
+    defaults: { _controller: "ConfigBundle:Parametro:createParametro" } 
+    requirements: { _method: post }
+
+
+parametro:
+    pattern:  /{table}
+    defaults: { _controller: "ConfigBundle:Parametro:index" }
+
+parametro_list:
+    pattern:  /list/{table}
+    defaults: { _controller: "ConfigBundle:Parametro:list" }   
+
+parametro_update:
+    pattern:  /update/{table}/{id}
+    defaults: { _controller: "ConfigBundle:Parametro:update" }    
+    requirements: { _method: post|put }  
+    
+parametro_new:
+    pattern:  /new/{table}
+    defaults: { _controller: "ConfigBundle:Parametro:new" }       
+    
+parametro_create:
+    pattern:  /create/{table}
+    defaults: { _controller: "ConfigBundle:Parametro:create" } 
+    requirements: { _method: post }
+    
+parametro_edit:
+    pattern:  /edit/{id}/{table}
+    defaults: { _controller: "ConfigBundle:Parametro:edit" }       
+
+
+    
+parametro_delete:
+    pattern:  /delete/{table}/{id}
+    defaults: { _controller: "ConfigBundle:Parametro:delete" }    
+    

@@ -1,0 +1,39 @@
+<?php
+namespace SG\ConfigBundle\Entity;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Gedmo\Mapping\Annotation as Gedmo;
+
+/**
+ * SG\ConfigBundle\Entity\Equipo
+ * @ORM\Table(name="equipo")
+ * @ORM\Entity()
+ */
+class Equipo
+{
+    /**
+     * @var integer $id
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    protected $id;
+    /**
+     * @var string $nombre
+     * @ORM\Column(name="nombre", type="string", nullable=false)
+     * @Assert\NotBlank()
+     */
+    protected $nombre;
+    /**
+     * @var string $descripcion
+     * @ORM\Column(name="descripcion", type="string", nullable=true)
+     */
+    protected $descripcion;
+    
+
+    public function __toString() {
+       return $this->nombre;
+    } 
+
+
+}

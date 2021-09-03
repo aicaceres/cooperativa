@@ -1,0 +1,133 @@
+{% extends "AdminBundle::layout.html.twig" %}
+
+{% block contentheader %}
+<h1> Socios</h1>
+{% endblock %}
+
+{% block content %}
+    {% include "AdminBundle::notification.html.twig" %}
+
+<div class='row'>
+    <div class='col-md-12'>
+        <div class='box box-solid box-primary'>
+            <div class='box-header'>
+                <h3 class='box-title'><i class="fa fa-envelope"></i> &nbsp;Envío de Correos</h3>
+            </div><!-- /.box-header -->
+            <div class='box-body pad'>
+                <div class="box-body table-responsive">
+                    
+                    <form action="{{path('socio_mailing') }}" method="post" role="form">
+                        <div class='box-body pad'>
+                            <fieldset>             
+                                <div class="col-md-1">
+                                    <div class="form-group">
+                                        <label>Asunto:</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <input required="required" type="text" value="{{asunto}}" class="form-control" id="asunto" name="asunto">
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <fieldset>             
+                                <div class="col-md-1">
+                                    <div class="form-group">
+                                        <label>Mensaje:</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">                                    
+                                    <div class="form-group">                                        
+                                        <textarea id="mensaje" required="required" name="mensaje" rows="3" class="form-control">{{mensaje}}</textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">                                    
+                                    <div class="form-group"> 
+                                        <a class="btn btn-app" id ="sendMails">
+                                            <i class="fa fa-cog fa-spin" style="display: none" ></i>                                            
+                                            <i class="fa fa-envelope"></i>
+                                            <span id="sending">Enviar  </span>                                      
+                                        </a>
+                                    </div>
+                                </div>
+                            </fieldset>
+                                                                                     
+                        </div>
+                        
+                    </form> 
+                    
+                    <table id="tablelist" class="table table-bordered table-hover">
+                        <thead>
+                            <tr>                                
+                                <th>Nombre y Apellido</th>
+                                <th>N° Documento</th>                                
+                                <th>Email</th>
+                                <th>Saldo</th>
+                                <th class="nosort aligncenter" style="width: 40px"><input type="checkbox" id="chkall"> </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+               {% for entity in entities %}
+                            <tr>                                
+                                <td>{{ entity.nombreCompleto }}</td>
+                                <td>{{ entity.nroDocumento }}</td>                                
+                                <td>{{ entity.email }}</td>
+                                <td class="alignright">{{ entity.saldo|number_format(2,'.',',')}}</td>
+                                <td class="aligncenter">
+                                    <input type="checkbox" name="chkmail" class="chkmail" data-id="{{entity.id}}">
+                                </td>
+                            </tr>
+               {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div><!-- /.box -->
+    </div><!-- /.col-->
+</div><!-- ./row -->
+{% endblock %}
+{% block page_javascript %}
+<script type="text/javascript">
+$(document).ready(function() {   
+    $('#chkall').on('ifChecked', function(){
+        $('.chkmail').iCheck('check');   
+      });
+    $('#chkall').on('ifUnchecked', function(){
+        $('.chkmail').iCheck('uncheck');   
+      });   
+      
+    $('#sendMails').on('click',function(){
+        if( $('.chkmail:checked').length ==0  ){
+            alert('Debe seleccionar al menos un socio.');
+            return false;
+        }else if( $('#asunto').val()=='' || $('#mensaje').val()==''  ){
+            alert('Debe ingresar Asunto y Mensaje.');
+            return false;
+        }else{
+            var mails = [];
+            $('.chkmail:checked').each(function( index ) {
+                mails.push($(this).data('id'));
+            });
+            if(confirm('Se enviarán '+mails.length+' correos. Confirma el envío?')){  
+                $('.fa-envelope').hide();
+                $('.fa-cog').show();
+                $('#sending').html('Enviando...');
+                $.ajax({
+                    type: "GET",
+                    url: "{{ path('send_mailing') }}",
+                    dataTpe: "JSON",
+                    async : true,
+                    data: { mails: mails, asunto: $('#asunto').val(), mensaje: $('#mensaje').val() }
+                  }).always(function( data ) { 
+                      $('.fa-cog').hide();
+                      $('.fa-envelope').show();
+                      $('#sending').html('Enviar');
+                      alert('Envío realizado!');
+                });
+            }else return false;    
+        }
+    });      
+});
+</script>
+{% endblock %}

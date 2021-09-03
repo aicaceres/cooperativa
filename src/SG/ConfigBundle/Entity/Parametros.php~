@@ -1,0 +1,55 @@
+<?php
+namespace SG\ConfigBundle\Entity;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Gedmo\Mapping\Annotation as Gedmo;
+
+/**
+ * SG\ConfigBundle\Entity\Parametros
+ * @ORM\Table(name="parametros")
+ * @ORM\Entity()
+ */
+class Parametros
+{
+    /**
+     * @var integer $id
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    protected $id;
+     
+    /**
+     * @var integer $diaVtoCuota
+     * @ORM\Column(name="dia_vto_cuota", type="integer")
+     */
+     protected $diaVtoCuota=10;
+
+    /**
+     * @var integer $tipoRecargoCuota
+     * @ORM\Column(name="tipo_recargo_cuota", type="string")
+     */
+     protected $tipoRecargoCuota;
+     
+     /**
+     * @var integer $montoRecargoCuota
+     * @ORM\Column(name="monto_recargo_cuota", type="integer")
+     */
+     protected $montoRecargoCuota;
+
+    /**
+     * @var User $updatedBy
+     * @Gedmo\Blameable(on="update")
+     * @ORM\ManyToOne(targetEntity="SG\ConfigBundle\Entity\Usuario")
+     * @ORM\JoinColumn(name="updated_by", referencedColumnName="id")
+     */
+    private $updatedBy;
+
+    /**
+     * @var datetime $updated
+     * @Gedmo\Timestampable(on="update")
+     * @ORM\Column(type="datetime")
+     */
+    private $updated;
+
+}

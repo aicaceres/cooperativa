@@ -1,0 +1,99 @@
+<!-- Left side column. contains the logo and sidebar -->
+<aside class="left-side sidebar-offcanvas">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+        <!-- Sidebar user panel -->
+        <div class="user-panel">
+            <div class="image" style="background-color: white">
+                <img src="{{ asset('assets/img/logos/logo.png') }}" class="img-circle" alt="Sistema de Gestión" />
+            </div>
+            <div class="info">
+                <a href="{{ path('logout') }}"><i class="fa fa-power-off"></i> Cerrar Sesión</a>
+            </div>
+        </div>
+        <!-- sidebar menu: : style can be found in sidebar.less -->
+        <ul class="sidebar-menu" style="font-size:14px">
+            <li id="homepage">
+                <a href="{{ path('admin_homepage') }}">
+                    <i class="fa fa-home"></i> <span>Inicio</span>
+                </a>
+            </li>
+            {% if app.user.perfil.socio %}
+            <li class="treeview">
+                <a href="javascript:void(0)">
+                    <i class="ion ion-person-stalker"></i>
+                    <span>Socios</span>
+                    <i class="fa fa-angle-left pull-right"></i>
+                </a>
+                <ul class="treeview-menu">
+                   
+                    {% if 'abm' in app.user.perfil.getItemMenu %}
+                    <li id="abm">  <a href="{{ path('socio_abm') }}"><i class="fa fa-angle-double-right"></i> Administración</a></li>
+                    {% endif %}
+                    {% if 'ctacte' in app.user.perfil.getItemMenu %}
+                    <li id="ctacte">  <a href="{{ path('socio_ctacte') }}"><i class="fa fa-angle-double-right"></i> Estado de Deuda</a></li>
+                    {% endif %}
+                    {% if 'socio-abm-liquidacion' in app.user.perfil.permisos %}
+                    <li id="liquidacion">  <a href="{{ path('socio_liquidacion') }}"><i class="fa fa-angle-double-right"></i> Liquidaciones</a></li>
+                    {% endif %}
+                    {% if 'socio-abm-mailing' in app.user.perfil.permisos %}
+                    <li id="mailing">  <a href="{{ path('socio_mailing') }}"><i class="fa fa-angle-double-right"></i> Envío de Correos</a></li>
+                    {% endif %}
+                </ul>
+            </li>            
+            {% endif %}
+            {% if app.user.perfil.caja %}
+            <li class="treeview">
+                <a href="javascript:void(0)">
+                    <i class="fa fa-money"></i>
+                    <span>Caja</span>
+                    <i class="fa fa-angle-left pull-right"></i>
+                </a>
+                <ul class="treeview-menu">
+                    <li id="movimiento">  <a href="{{ path('caja_movimiento') }}"><i class="fa fa-angle-double-right"></i> Registración</a></li>
+                    <li id="aperturacierre"><a href="{{ path('caja_aperturacierre') }}"><i class="fa fa-angle-double-right"></i> Apertura/Cierre Caja</a></li>
+                    <li id="informes"><a href="{{ path('caja_informes') }}"><i class="fa fa-angle-double-right"></i> Informes de Caja</a></li>
+                </ul>
+            </li>
+            {% endif %}
+            {% if 'socio-abm-informes' in app.user.perfil.permisos %}
+            <li class="treeview">
+                <a href="javascript:void(0)">
+                    <i class="fa fa-list-ul"></i>
+                    <span>Informes</span>
+                    <i class="fa fa-angle-left pull-right"></i>
+                </a>
+                <ul class="treeview-menu">                    
+                    <li id="informe"><a href="{{ path('empleado_informe') }}"><i class="fa fa-angle-double-right"></i> Empleados</a></li>
+                </ul>
+            </li>
+            {% endif %}
+            {% if app.user.perfil.parametro %}
+            <li id="parametro">
+                <a href="{{ path('parametro',{ 'table': 'Empresa' }) }}">
+                    <i class="fa fa-cogs"></i> <span>Parámetros</span>
+                </a>
+            </li>   
+            {% endif %}        
+            {% if app.user.perfil.seguridad %}            
+            <li class="treeview">
+                <a href="javascript:void(0)">
+                    <i class="fa fa-lock"></i>
+                    <span>Seguridad</span>
+                    <i class="fa fa-angle-left pull-right"></i>
+                </a>
+                <ul class="treeview-menu">
+                    {% if 'usuario' in app.user.perfil.getItemMenu %}
+                    <li id="usuario">   <a href="{{ path('seguridad_usuario') }}"><i class="fa fa-angle-double-right"></i> Usuarios</a></li>
+                    {% endif %}        
+                    {% if 'perfil' in app.user.perfil.getItemMenu %}
+                    <li id="perfil">    <a href="{{ path('seguridad_perfil') }}"><i class="fa fa-angle-double-right"></i> Perfiles</a></li>
+                    {% endif %}        
+                    <li id="auditoria" style="display: none"> <a href="{{ path('seguridad_auditoria') }}"><i class="fa fa-angle-double-right"></i> Auditoría</a></li>
+                </ul>
+            </li>
+            {% endif %}            
+        </ul>
+    </section>
+    <!-- /.sidebar --> 
+</aside>

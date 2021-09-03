@@ -1,0 +1,34 @@
+<?php
+namespace SG\ConfigBundle\Entity;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Gedmo\Mapping\Annotation as Gedmo;
+
+/**
+ * SG\ConfigBundle\Entity\TipoOperacion
+ * @ORM\Table(name="tipo_operacion")
+ * @ORM\Entity()
+ */
+class TipoOperacion
+{
+    /**
+     * @var integer $id
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    protected $id;
+    /**
+     * @var string $nombre
+     * @ORM\Column(name="nombre", type="string", nullable=false)
+     * @Assert\NotBlank()
+     */
+    protected $nombre;
+    /**
+     * @var string $monto
+     * @ORM\Column(name="monto", type="decimal", scale=2, nullable=true)
+     */
+    protected $monto;
+
+
+}

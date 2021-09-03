@@ -1,0 +1,764 @@
+<?php
+namespace SG\AdminBundle\Entity;
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+/** 
+ * SG\AdminBundle\Entity\ParteQuirurgico
+ * @ORM\Table(name="parte_quirurgico")
+ * @ORM\Entity()
+ */
+class ParteQuirurgico
+{
+    /**
+     * @var integer $id
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    protected $id;
+    
+    /**
+    * @ORM\OneToOne(targetEntity="SG\AdminBundle\Entity\Internacion", inversedBy="parteQuirurgico")
+    * @ORM\JoinColumn(name="internacion_id", referencedColumnName="id")
+    */
+    protected $internacion;
+
+    /**
+     * @var date $fecha
+     * @ORM\Column(name="fecha", type="date", nullable=true)
+     */
+    protected $fecha;
+    /**
+     * @var string $hora
+     * @ORM\Column(name="hora", type="time", nullable=true)
+     */
+    protected $hora;
+
+    /**
+     * @var string $comienzo
+     * @ORM\Column(name="comienzo", type="string", nullable=true)
+     */
+    protected $comienzo;
+
+    /**
+     * @var string $termino
+     * @ORM\Column(name="termino", type="string", nullable=true)
+     */
+    protected $termino;
+
+    /**
+     * @var string $tipo
+     * @ORM\Column(name="tipo", type="string", length=1, nullable=true)
+     */
+    protected $tipo='U';
+    
+    /**
+    * @ORM\ManyToOne(targetEntity="SG\AdminBundle\Entity\Medico")
+    * @ORM\JoinColumn(name="cirujano_id", referencedColumnName="id")
+    */
+    protected $cirujano;    
+    
+    /**
+    * @ORM\ManyToOne(targetEntity="SG\AdminBundle\Entity\Medico")
+    * @ORM\JoinColumn(name="anestesista_id", referencedColumnName="id")
+    */
+    protected $anestesista;    
+    
+    /**
+    * @ORM\ManyToOne(targetEntity="SG\AdminBundle\Entity\Medico")
+    * @ORM\JoinColumn(name="instrumentista_id", referencedColumnName="id")
+    */
+    protected $instrumentista;    
+    
+    /**
+    * @ORM\ManyToOne(targetEntity="SG\AdminBundle\Entity\Medico")
+    * @ORM\JoinColumn(name="ayudante1_id", referencedColumnName="id")
+    */
+    protected $ayudante1;    
+    
+    /**
+    * @ORM\ManyToOne(targetEntity="SG\AdminBundle\Entity\Medico")
+    * @ORM\JoinColumn(name="ayudante2_id", referencedColumnName="id")
+    */
+    protected $ayudante2;    
+    
+    /**
+    * @ORM\ManyToOne(targetEntity="SG\AdminBundle\Entity\Medico")
+    * @ORM\JoinColumn(name="ayudante3_id", referencedColumnName="id")
+    */
+    protected $ayudante3;    
+
+    /**
+     * @var string $diagnosticoPreoperatorio
+     * @ORM\Column(name="diagnostico_preoperatorio", type="string", nullable=true)
+     */
+    protected $diagnosticoPreoperatorio;
+
+    /**
+     * @var string $diagnosticoPostoperatorio
+     * @ORM\Column(name="diagnostico_postoperatorio", type="string", nullable=true)
+     */
+    protected $diagnosticoPostoperatorio;
+
+    /**
+     * @var string $codigos
+     * @ORM\Column(name="codigos", type="string", nullable=true)
+     */
+    protected $codigos;
+
+    /**
+     * @var string $procedimientoQuirurgico
+     * @ORM\Column(name="procedimiento_quirurgico", type="text", nullable=true)
+     */
+    protected $procedimientoQuirurgico;
+
+    /**
+     * @var string $parteAnestesista
+     * @ORM\Column(name="parte_anestesista", type="text", nullable=true)
+     */
+    protected $parteAnestesista;
+
+    /**
+     * @var string $radiologia
+     * @ORM\Column(name="radiologia", type="string", nullable=true)
+     */
+    protected $radiologia;
+
+    /**
+     * @var string $anatomiaPatologica
+     * @ORM\Column(name="anatomia_patologica", type="string", nullable=true)
+     */
+    protected $anatomiaPatologica;
+
+    /**
+     * @var string $hemoterapia
+     * @ORM\Column(name="hemoterapia", type="string", nullable=true)
+     */
+    protected $hemoterapia;
+
+    /**
+     * @var string $monitoreo
+     * @ORM\Column(name="monitoreo", type="string", nullable=true)
+     */
+    protected $monitoreo;
+    
+    /**
+     * @var string $observaciones
+     * @ORM\Column(name="observaciones", type="text", nullable=true)
+     */
+    protected $observaciones;
+    
+    /**
+     * @var datetime $created
+     * @Gedmo\Timestampable(on="create")
+     * @ORM\Column(type="datetime")
+     */
+    private $created;
+    /**
+     * @var User $createdBy
+     * @Gedmo\Blameable(on="create")
+     * @ORM\ManyToOne(targetEntity="SG\ConfigBundle\Entity\Usuario")
+     * @ORM\JoinColumn(name="created_by", referencedColumnName="id")
+     */
+    private $createdBy;
+    
+    /**
+     * @var datetime $updated
+     * @Gedmo\Timestampable(on="update")
+     * @ORM\Column(type="datetime")
+     */
+    private $updated;
+
+    /**
+     * @var User $updatedBy
+     * @Gedmo\Blameable(on="update")
+     * @ORM\ManyToOne(targetEntity="SG\ConfigBundle\Entity\Usuario")
+     * @ORM\JoinColumn(name="updated_by", referencedColumnName="id")
+     */
+    private $updatedBy;         
+
+    /**
+     * Get id
+     *
+     * @return integer 
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set fecha
+     *
+     * @param \DateTime $fecha
+     * @return ParteQuirurgico
+     */
+    public function setFecha($fecha)
+    {
+        $this->fecha = $fecha;
+
+        return $this;
+    }
+
+    /**
+     * Get fecha
+     *
+     * @return \DateTime 
+     */
+    public function getFecha()
+    {
+        return $this->fecha;
+    }
+
+    /**
+     * Set hora
+     *
+     * @param \DateTime $hora
+     * @return ParteQuirurgico
+     */
+    public function setHora($hora)
+    {
+        $this->hora = $hora;
+
+        return $this;
+    }
+
+    /**
+     * Get hora
+     *
+     * @return \DateTime 
+     */
+    public function getHora()
+    {
+        return $this->hora;
+    }
+
+    /**
+     * Set comienzo
+     *
+     * @param string $comienzo
+     * @return ParteQuirurgico
+     */
+    public function setComienzo($comienzo)
+    {
+        $this->comienzo = $comienzo;
+
+        return $this;
+    }
+
+    /**
+     * Get comienzo
+     *
+     * @return string 
+     */
+    public function getComienzo()
+    {
+        return $this->comienzo;
+    }
+
+    /**
+     * Set termino
+     *
+     * @param string $termino
+     * @return ParteQuirurgico
+     */
+    public function setTermino($termino)
+    {
+        $this->termino = $termino;
+
+        return $this;
+    }
+
+    /**
+     * Get termino
+     *
+     * @return string 
+     */
+    public function getTermino()
+    {
+        return $this->termino;
+    }
+
+    /**
+     * Set tipo
+     *
+     * @param string $tipo
+     * @return ParteQuirurgico
+     */
+    public function setTipo($tipo)
+    {
+        $this->tipo = $tipo;
+
+        return $this;
+    }
+
+    /**
+     * Get tipo
+     *
+     * @return string 
+     */
+    public function getTipo()
+    {
+        return $this->tipo;
+    }
+
+    /**
+     * Set diagnosticoPreoperatorio
+     *
+     * @param string $diagnosticoPreoperatorio
+     * @return ParteQuirurgico
+     */
+    public function setDiagnosticoPreoperatorio($diagnosticoPreoperatorio)
+    {
+        $this->diagnosticoPreoperatorio = $diagnosticoPreoperatorio;
+
+        return $this;
+    }
+
+    /**
+     * Get diagnosticoPreoperatorio
+     *
+     * @return string 
+     */
+    public function getDiagnosticoPreoperatorio()
+    {
+        return $this->diagnosticoPreoperatorio;
+    }
+
+    /**
+     * Set diagnosticoPostoperatorio
+     *
+     * @param string $diagnosticoPostoperatorio
+     * @return ParteQuirurgico
+     */
+    public function setDiagnosticoPostoperatorio($diagnosticoPostoperatorio)
+    {
+        $this->diagnosticoPostoperatorio = $diagnosticoPostoperatorio;
+
+        return $this;
+    }
+
+    /**
+     * Get diagnosticoPostoperatorio
+     *
+     * @return string 
+     */
+    public function getDiagnosticoPostoperatorio()
+    {
+        return $this->diagnosticoPostoperatorio;
+    }
+
+    /**
+     * Set codigos
+     *
+     * @param string $codigos
+     * @return ParteQuirurgico
+     */
+    public function setCodigos($codigos)
+    {
+        $this->codigos = $codigos;
+
+        return $this;
+    }
+
+    /**
+     * Get codigos
+     *
+     * @return string 
+     */
+    public function getCodigos()
+    {
+        return $this->codigos;
+    }
+
+    /**
+     * Set procedimientoQuirurgico
+     *
+     * @param string $procedimientoQuirurgico
+     * @return ParteQuirurgico
+     */
+    public function setProcedimientoQuirurgico($procedimientoQuirurgico)
+    {
+        $this->procedimientoQuirurgico = $procedimientoQuirurgico;
+
+        return $this;
+    }
+
+    /**
+     * Get procedimientoQuirurgico
+     *
+     * @return string 
+     */
+    public function getProcedimientoQuirurgico()
+    {
+        return $this->procedimientoQuirurgico;
+    }
+
+    /**
+     * Set created
+     *
+     * @param \DateTime $created
+     * @return ParteQuirurgico
+     */
+    public function setCreated($created)
+    {
+        $this->created = $created;
+
+        return $this;
+    }
+
+    /**
+     * Get created
+     *
+     * @return \DateTime 
+     */
+    public function getCreated()
+    {
+        return $this->created;
+    }
+
+    /**
+     * Set updated
+     *
+     * @param \DateTime $updated
+     * @return ParteQuirurgico
+     */
+    public function setUpdated($updated)
+    {
+        $this->updated = $updated;
+
+        return $this;
+    }
+
+    /**
+     * Get updated
+     *
+     * @return \DateTime 
+     */
+    public function getUpdated()
+    {
+        return $this->updated;
+    }
+
+    /**
+     * Set internacion
+     *
+     * @param \SG\AdminBundle\Entity\Internacion $internacion
+     * @return ParteQuirurgico
+     */
+    public function setInternacion(\SG\AdminBundle\Entity\Internacion $internacion = null)
+    {
+        $this->internacion = $internacion;
+
+        return $this;
+    }
+
+    /**
+     * Get internacion
+     *
+     * @return \SG\AdminBundle\Entity\Internacion 
+     */
+    public function getInternacion()
+    {
+        return $this->internacion;
+    }
+
+    /**
+     * Set cirujano
+     *
+     * @param \SG\AdminBundle\Entity\Medico $cirujano
+     * @return ParteQuirurgico
+     */
+    public function setCirujano(\SG\AdminBundle\Entity\Medico $cirujano = null)
+    {
+        $this->cirujano = $cirujano;
+
+        return $this;
+    }
+
+    /**
+     * Get cirujano
+     *
+     * @return \SG\AdminBundle\Entity\Medico 
+     */
+    public function getCirujano()
+    {
+        return $this->cirujano;
+    }
+
+    /**
+     * Set anestesista
+     *
+     * @param \SG\AdminBundle\Entity\Medico $anestesista
+     * @return ParteQuirurgico
+     */
+    public function setAnestesista(\SG\AdminBundle\Entity\Medico $anestesista = null)
+    {
+        $this->anestesista = $anestesista;
+
+        return $this;
+    }
+
+    /**
+     * Get anestesista
+     *
+     * @return \SG\AdminBundle\Entity\Medico 
+     */
+    public function getAnestesista()
+    {
+        return $this->anestesista;
+    }
+
+    /**
+     * Set instrumentista
+     *
+     * @param \SG\AdminBundle\Entity\Medico $instrumentista
+     * @return ParteQuirurgico
+     */
+    public function setInstrumentista(\SG\AdminBundle\Entity\Medico $instrumentista = null)
+    {
+        $this->instrumentista = $instrumentista;
+
+        return $this;
+    }
+
+    /**
+     * Get instrumentista
+     *
+     * @return \SG\AdminBundle\Entity\Medico 
+     */
+    public function getInstrumentista()
+    {
+        return $this->instrumentista;
+    }
+
+    /**
+     * Set ayudante1
+     *
+     * @param \SG\AdminBundle\Entity\Medico $ayudante1
+     * @return ParteQuirurgico
+     */
+    public function setAyudante1(\SG\AdminBundle\Entity\Medico $ayudante1 = null)
+    {
+        $this->ayudante1 = $ayudante1;
+
+        return $this;
+    }
+
+    /**
+     * Get ayudante1
+     *
+     * @return \SG\AdminBundle\Entity\Medico 
+     */
+    public function getAyudante1()
+    {
+        return $this->ayudante1;
+    }
+
+    /**
+     * Set ayudante2
+     *
+     * @param \SG\AdminBundle\Entity\Medico $ayudante2
+     * @return ParteQuirurgico
+     */
+    public function setAyudante2(\SG\AdminBundle\Entity\Medico $ayudante2 = null)
+    {
+        $this->ayudante2 = $ayudante2;
+
+        return $this;
+    }
+
+    /**
+     * Get ayudante2
+     *
+     * @return \SG\AdminBundle\Entity\Medico 
+     */
+    public function getAyudante2()
+    {
+        return $this->ayudante2;
+    }
+
+    /**
+     * Set ayudante3
+     *
+     * @param \SG\AdminBundle\Entity\Medico $ayudante3
+     * @return ParteQuirurgico
+     */
+    public function setAyudante3(\SG\AdminBundle\Entity\Medico $ayudante3 = null)
+    {
+        $this->ayudante3 = $ayudante3;
+
+        return $this;
+    }
+
+    /**
+     * Get ayudante3
+     *
+     * @return \SG\AdminBundle\Entity\Medico 
+     */
+    public function getAyudante3()
+    {
+        return $this->ayudante3;
+    }
+
+    /**
+     * Set createdBy
+     *
+     * @param \SG\ConfigBundle\Entity\Usuario $createdBy
+     * @return ParteQuirurgico
+     */
+    public function setCreatedBy(\SG\ConfigBundle\Entity\Usuario $createdBy = null)
+    {
+        $this->createdBy = $createdBy;
+
+        return $this;
+    }
+
+    /**
+     * Get createdBy
+     *
+     * @return \SG\ConfigBundle\Entity\Usuario 
+     */
+    public function getCreatedBy()
+    {
+        return $this->createdBy;
+    }
+
+    /**
+     * Set updatedBy
+     *
+     * @param \SG\ConfigBundle\Entity\Usuario $updatedBy
+     * @return ParteQuirurgico
+     */
+    public function setUpdatedBy(\SG\ConfigBundle\Entity\Usuario $updatedBy = null)
+    {
+        $this->updatedBy = $updatedBy;
+
+        return $this;
+    }
+
+    /**
+     * Get updatedBy
+     *
+     * @return \SG\ConfigBundle\Entity\Usuario 
+     */
+    public function getUpdatedBy()
+    {
+        return $this->updatedBy;
+    }
+
+    /**
+     * Set radiologia
+     *
+     * @param string $radiologia
+     * @return ParteQuirurgico
+     */
+    public function setRadiologia($radiologia)
+    {
+        $this->radiologia = $radiologia;
+
+        return $this;
+    }
+
+    /**
+     * Get radiologia
+     *
+     * @return string 
+     */
+    public function getRadiologia()
+    {
+        return $this->radiologia;
+    }
+
+    /**
+     * Set anatomiaPatologica
+     *
+     * @param string $anatomiaPatologica
+     * @return ParteQuirurgico
+     */
+    public function setAnatomiaPatologica($anatomiaPatologica)
+    {
+        $this->anatomiaPatologica = $anatomiaPatologica;
+
+        return $this;
+    }
+
+    /**
+     * Get anatomiaPatologica
+     *
+     * @return string 
+     */
+    public function getAnatomiaPatologica()
+    {
+        return $this->anatomiaPatologica;
+    }
+
+    /**
+     * Set hemoterapia
+     *
+     * @param string $hemoterapia
+     * @return ParteQuirurgico
+     */
+    public function setHemoterapia($hemoterapia)
+    {
+        $this->hemoterapia = $hemoterapia;
+
+        return $this;
+    }
+
+    /**
+     * Get hemoterapia
+     *
+     * @return string 
+     */
+    public function getHemoterapia()
+    {
+        return $this->hemoterapia;
+    }
+
+    /**
+     * Set monitoreo
+     *
+     * @param string $monitoreo
+     * @return ParteQuirurgico
+     */
+    public function setMonitoreo($monitoreo)
+    {
+        $this->monitoreo = $monitoreo;
+
+        return $this;
+    }
+
+    /**
+     * Get monitoreo
+     *
+     * @return string 
+     */
+    public function getMonitoreo()
+    {
+        return $this->monitoreo;
+    }
+
+    /**
+     * Set observaciones
+     *
+     * @param string $observaciones
+     * @return ParteQuirurgico
+     */
+    public function setObservaciones($observaciones)
+    {
+        $this->observaciones = $observaciones;
+
+        return $this;
+    }
+
+    /**
+     * Get observaciones
+     *
+     * @return string 
+     */
+    public function getObservaciones()
+    {
+        return $this->observaciones;
+    }
+}

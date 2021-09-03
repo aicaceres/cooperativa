@@ -1,0 +1,164 @@
+<style>
+.modal-body {
+    overflow-y:visible !important;
+}
+</style>
+<form action="{{urlaction }}" id="formulario-modal" name="vehiculo" method="post" role="form" {{ form_enctype(form) }}>    
+    
+    {% include "AdminBundle::form-notification.html.twig" %}
+
+    <fieldset>                            
+        <div class="col-md-6">
+            <div class="form-group">
+                {{ form_row(form.dominio, { 'attr': {'class' : 'form-control' } }) }}
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                {{ form_row(form.anio, { 'attr': {'class' : 'form-control' } }) }}
+            </div>
+        </div>
+         <div class="col-md-3">
+            <div class="form-group">
+                {{ form_row(form.carga, { 'attr': {'class' : 'form-control' } }) }}
+            </div>
+        </div>                                                                             
+    </fieldset>                                                                      
+    <fieldset>
+        <div class="col-md-6">
+            <div class="form-group">
+                {{ form_row(form.marca, { 'attr': {'class' : 'form-control' } }) }}
+            </div>
+        </div> 
+        <div class="col-md-6">
+            <div class="form-group">
+                {{ form_row(form.modelo, { 'attr': {'class' : 'form-control' } }) }}
+            </div>
+        </div>
+    </fieldset>                                                                      
+    <fieldset>
+                                   
+        <div class="col-md-4">
+            <div class="form-group">
+                {{ form_row(form.asignadoAlSocio) }}
+            </div>                        
+        </div>                                                                 
+        <div class="col-md-8 empleado">
+            <div class="form-group">
+                {{ form_row(form.empleado, { 'attr': {'class' : 'form-control' } }) }}
+            </div>
+        </div>
+    </fieldset>                                                                      
+    <fieldset>
+        
+        <br>
+        <table id="lineas" class="table table-bordered table-hover">
+            <tbody data-index="{{form.lineas | length }}" class="collectionHolder"
+                   data-prototype="{% filter escape %}{% include 'AdminBundle:Vehiculo:linea-prototype.html.twig' with {'item':form.lineas.vars.prototype} %}{% endfilter %}">
+                {{ form_errors(form.lineas) }}
+                <tr>
+                    <th style="width: 5%">#</th>
+                    <th style="width: 69%"> Líneas</th>
+                    <th style="width: 20%"> Kilómetros</th>
+                    <th style="width: 5%">
+                        <button type="button" class="linkAddLinea" title="Agregar"><i class="fa fa-plus"></i></button>
+                    </th>
+                </tr>
+                {% for item in form.lineas %}
+                    <tr class="td">
+                        <td class="ordTd"></td>                        
+                        <td>{{ form_widget(item.nombre, { 'attr': {'class' : 'form-control' } }) }} </td>
+                        <td>{{ form_widget(item.kilometros, { 'attr': {'class' : 'form-control alignright importe' } }) }}</td>
+                        <td class="link-actions"> </td>
+                    </tr>
+                {% endfor %}
+            </tbody>            
+        </table>        
+        
+        
+        
+    </fieldset>                                                                                                                                            
+       
+    <div style="display:none">{{ form_rest(form) }}</div>
+
+</form>    
+<script type="text/javascript">    
+$(document).ready(function() {
+    $("#sg_adminbundle_vehiculo_empleado").chosen({
+        no_results_text: "Sin resultados", 
+        placeholder_text_single: 'Seleccione una opción' ,
+        search_contains: true,
+        allow_single_deselect:true});
+    var emp = $("#sg_adminbundle_vehiculo_empleado").val();
+    $.ajax({
+        type: "POST",
+        url: "{{ path('empleados_x_socio',{'id':entity.socio.id}) }}",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function (data) {            
+            $("#sg_adminbundle_vehiculo_empleado").html('');
+            $("#sg_adminbundle_vehiculo_empleado").append( '<option value=""></option>' )
+            $.each(data, function (idx, obj) {            
+                $("#sg_adminbundle_vehiculo_empleado").append('<option value="' + obj.id + '">' + obj.apellido+', '+obj.nombre + '</option>');
+            });
+            $("#sg_adminbundle_vehiculo_empleado").val(emp);
+            $("#sg_adminbundle_vehiculo_empleado").trigger("chosen:updated");
+            $("#sg_adminbundle_vehiculo_empleado").chosen({ width: "95%" });
+        },
+        error: function (data) {
+            console.log(data);
+        }
+    });
+    
+    $('#sg_adminbundle_vehiculo_asignadoAlSocio').on('change',function(){
+        if( $(this).is(":checked") ){
+            $('#sg_adminbundle_vehiculo_empleado').val('');
+            $('#sg_adminbundle_vehiculo_empleado').trigger("chosen:updated");
+            $('.empleado').hide();
+        }else{
+            $('.empleado').show();
+        }
+    });
+    $('#sg_adminbundle_vehiculo_asignadoAlSocio').change();
+    
+    // LINEAS
+    $('.linkAddLinea').on('click', function(e) {
+        e.preventDefault();
+        var holder = $('.collectionHolder');
+        addNewItem(holder);
+    });
+
+    $('.collectionHolder').find('.link-actions').each(function() {
+        addItemFormDeleteLink($(this));
+    });
+    setOrder();
+    
+});    
+function addNewItem($collectionHolder) {
+    var prototype = $collectionHolder.data('prototype');
+    var index = $collectionHolder.data('index');
+    var newForm = prototype.replace(/items/g, index);
+    $collectionHolder.append(newForm);
+
+    $collectionHolder.data('index', index + 1);
+    $collectionHolder.find('.ordTd').last().html($collectionHolder.data('index'));
+    addItemFormDeleteLink( $collectionHolder.find('.link-actions').last() );
+}
+function addItemFormDeleteLink($itemForm) {
+    var $removeFormA = $('<button type="button" title="Eliminar"><i class="fa fa-trash"></i></button>');
+    $itemForm.prepend($removeFormA);
+    $removeFormA.on('click', function(e) {
+        if ( confirm('Desea eliminar este item?') ) {
+            e.preventDefault();
+            $itemForm.parent().remove(); 
+            setOrder();
+            $('.collectionHolder').data('index', $('.collectionHolder').find('.ordTd').length );
+        }
+    });
+}
+function setOrder(){
+    $('.collectionHolder').find('.ordTd').each(function(i) {        
+        $(this).html(i + 1);
+    });
+}
+</script>

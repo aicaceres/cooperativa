@@ -1,0 +1,115 @@
+{% block content %}
+<div class='row'>
+    <div class='col-md-12'>
+        <div class='box box-solid box-success' style="margin-top:10px">
+            <div class='box-header'>
+                <h3 class='box-title'> {{entity.socio.nombreCompleto}} </h3>
+            </div><!-- /.box-header -->
+            <form action="{{ path('socio_create_deuda') }}" method="post" role="form" {{ form_enctype(form) }}>
+                {{ form_errors(form) }}
+                <div class='box-body pad'>
+                    {% include "AdminBundle::form-notification.html.twig" %}
+                    <fieldset>
+                        <input type="hidden" name="socioId" value="{{entity.socio.id}}">
+                        <div class="form-group col-md-1">
+                            {{ form_row(form.concepto) }}
+                        </div>
+                        <div class="form-group col-md-3">
+                            {{ form_row(form.descripcion) }}
+                        </div>                        
+                        <div class="form-group col-md-2">
+                                {{ form_label(form.fechaVto) }}
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                        {{ form_widget(form.fechaVto, { 'attr': {'class' : 'form-control datepicker pasada' } }) }}
+                            </div><!-- /.input group -->
+                            {{ form_errors(form.fechaVto) }}
+                        </div>
+
+                        <div class="form-group col-md-5">
+                                {{ form_row(form.monto, { 'attr': {'class' : 'form-control' } }) }}
+                        </div>
+                    </fieldset>
+ 
+   
+                    <br>
+
+                <div class="box-footer">
+                    <div class="btn-group pull-right">
+                        <button type="button" class="btn btn-app" id="addNewPaciente"><i class="fa fa-save"></i> Guardar</button>
+                        <button type="button" class="btn btn-app" id="cancelNewPaciente"><i class="fa fa-reply"></i> Cancelar</button>
+                    </div>
+                </div>
+                <div style="display:none">{{ form_rest(form) }}</div>
+            </form>
+        </div><!-- /.box -->
+    </div><!-- /.col-->
+</div><!-- ./row -->
+{% endblock %}
+
+{% block page_javascript %}
+<!-- Bootstrap file-input-->
+<script src="{{ asset('assets/js/bootstrap.file-input.js') }}" type="text/javascript"></script>
+<script src="{{ asset('assets/js/app.js') }}" type="text/javascript"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    $(".chosen").chosen();
+    $('#sg_adminbundle_paciente_fechaNacimiento').on('blur',function(){
+        $('#sg_adminbundle_paciente_edad').val( calcular_edad($(this).val())  );
+    })
+// Get the container who holds the collection
+    $('.collectionHolder').find('.form-actions').each(function() {
+        addItemFormDeleteLink($(this));
+    });
+    $('.linkAdd').on('click', function(e) {
+        e.preventDefault();
+        holder = $(this).closest('.row').siblings('.collectionHolder');
+        addNewItem(holder);
+    });
+    $('input[type=file]').bootstrapFileInput();
+    $('#cancelNewPaciente').on('click',function(){
+        $('#paciente-modal').modal('hide');
+    });
+    $('#addNewPaciente').on('click',function(){
+        // buscar tabs cerrados con datos invalidos
+        var invalid = $('input:required:invalid,textarea:required:invalid');
+        if(invalid.length>0){
+            var tab = $('input:required:invalid,textarea:required:invalid').closest(".box").find('.box-header');
+            var body = $('input:required:invalid,textarea:required:invalid').closest(".box").find('.box-body');
+            if( body.is(':hidden') ){
+                tab.find('button').click();
+                $('input:required:invalid').focus();                
+            }
+            alert('Debe completar todos los datos requeridos.');
+            return false;
+        }
+        
+        var sel = $('select:required:invalid').attr('id');
+        if(sel){
+            $('#'+sel+'_chosen').find('input').focus();
+            return false;
+        }
+        
+        $.ajax({
+            url: '',
+            dataType: 'json',
+            type: "POST",
+            data: $('form').serialize(),
+            success: function(data){
+                if (data = 'OK') {
+                    alert('El paciente fue creado correctamente y asociado al turno.');
+                    $('#paciente-modal').modal('hide');
+                    mostrarTurnos();
+                } 
+            }
+        });
+        
+        
+    });
+
+});
+
+</script>
+{% endblock %}

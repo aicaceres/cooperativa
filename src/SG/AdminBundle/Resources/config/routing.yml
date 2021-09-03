@@ -1,0 +1,23 @@
+admin_socio:
+    resource: "@AdminBundle/Resources/config/routing/socio.yml"
+    prefix:   /socio
+    
+admin_empleado:
+    resource: "@AdminBundle/Resources/config/routing/empleado.yml"
+    prefix:   /empleado 
+    
+admin_vehiculo:
+    resource: "@AdminBundle/Resources/config/routing/vehiculo.yml"
+    prefix:   /vehiculo    
+
+admin_caja:
+    resource: "@AdminBundle/Resources/config/routing/caja.yml"
+    prefix:   /caja
+
+admin_homepage:
+    path:     /
+    defaults: { _controller: AdminBundle:Home:index }
+    
+get_monto_concepto_caja:
+    pattern:  /getMontoConceptoCaja
+    defaults: { _controller: "ConfigBundle:Parametro:getMontoConceptoCaja" }      

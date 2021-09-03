@@ -1,0 +1,126 @@
+{% extends "AdminBundle::layout.html.twig" %}
+
+{% block contentheader %}
+<h1> Socios</h1>
+{% endblock %}
+
+{% block content %}
+    {% include "AdminBundle::notification.html.twig" %}
+<div class='row'>
+    <div class='col-md-12'>
+        <div class='box box-solid box-primary'>
+            <div class='box-header'>
+                <h3 class='box-title'><i class="fa fa-list-alt"></i> &nbsp;Liquidaciones</h3>
+            </div><!-- /.box-header -->
+            <div class='box-body'>
+                <form action="#" method="post" role="form">
+                    <fieldset>
+                        <div class="form-group col-xs-6">
+                            <div class="input-group">
+                                <span class="input-group-addon"><strong>SOCIO:</strong></span>
+                                <input name="_socio" url="{{ path('socio_suggest') }}" type="text" class="form-control" 
+                                       value="{% if socio %}{{socio.nombreCompleto}} (DNI {{socio.nroDocumento}}) {% endif %}" id="socioAutocomplete" placeholder="Seleccionar..."/>  
+                                <input type="hidden" name="_socioId" value="{% if socio %}{{socio.id}} {% endif %}" id="socioId" />                    
+                            </div>                
+                        </div>
+                        <div class="form-group col-xs-1">
+                            <button type="button" class="limpiar" data-toggle="tooltip" title="Limpiar los datos / Buscar otro Socio"><i class="fa fa-refresh"></i></button>
+                        </div>                                                   
+                    </fieldset>                
+                </form>        
+                <!-- DATOS LIQUIDACIONES  -->                        
+                <div id="datosLiquidaciones">
+                    
+                </div>
+                <br>                
+            </div>
+        </div><!-- /.box -->
+    </div><!-- /.col-->
+</div><!-- ./row -->
+
+<!-- DEUDA/CONCEPTO -->
+<div id="deuda-modal" data-tipo="" class="modal modal-wide fade" role="dialog" aria-labelledby="deuda-modal" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog" style="width: 40%;">
+        <div class="modal-content">
+            <div class="modal-header" style="padding:10px 15px;">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title"><i class="fa fa-angle-double-right"></i> &nbsp; <span id="modalTitle"></span></h4>
+            </div>
+            <div class="modal-body" style="overflow-y: auto; padding:0 3px;">
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->    
+
+{% endblock %}
+{% block page_javascript %}
+
+<script type="text/javascript">
+$(document).ready(function () {
+    
+    if (isEmpty($('#socioId').val())){       
+        $('#datosLiquidaciones').hide();
+    }else{
+        mostrarDatos();
+    }
+                
+    $('.limpiar').on('click', function () {
+        $('#socioAutocomplete').val('');
+        $('#socioId').val('');
+        $('#datosLiquidaciones').hide();
+        $('#listLiquidaciones').html('');
+        $('.socioId').val('');
+        $('#socioAutocomplete').focus();        
+    });   
+    $("#socioAutocomplete").change(function () {
+        if (isEmpty($(this).val()))
+            $("#socioId").val('');            
+    });
+    $('#socioAutocomplete').autocomplete({
+        minLength: 2,
+        source: $('#socioAutocomplete').attr('url'),
+        search: function (event, ui) {
+            $("#socioId").val('');
+        },
+        select: function (event, ui) {
+            $("#socioId").val(ui.item.id);
+            mostrarDatos();
+        }
+    });    
+        
+          
+        
+        
+});      
+function mostrarDatos(){        
+    $.get('{{ path('socio_datosLiquidaciones') }}', { socioId: $('#socioId').val() }, function (data) {
+            $('#datosLiquidaciones').html(data);  
+            $('#datosLiquidaciones').fadeIn();   
+            $('[id*="tr_detalle_"]').hide();  
+            
+            $('.vermas').click(function(){
+                id = $(this).attr('id');
+                trDetalle = $(this).parent().parent().next();
+                tipoDetalle = trDetalle.data('tipo');            
+                if( $(this).hasClass('cerrar') ){
+                    //trDetalle.find('.datos_detalle').html('');
+                    $(this).removeClass('cerrar');
+                    $(this).html('<i class="fa fa-caret-down"></i>');
+                }else{ 
+                    if(trDetalle.find('.datos_detalle').html()==''){
+                        //traer datos
+                        $.get("{{path('caja_movimiento_getDetalle')}}", { id: id, tipo: tipoDetalle })
+                            .done(function( data ) {
+                                trDetalle.find('.datos_detalle').html(data);
+                        });        
+                    }
+                    $(this).addClass('cerrar');
+                    $(this).html('<i class="fa fa-caret-up"></i>');
+                } 
+                trDetalle.fadeToggle("slow");
+
+            });
+        }, "json");    
+}
+</script>
+{% endblock %}

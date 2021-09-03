@@ -1,0 +1,161 @@
+{% extends "AdminBundle::layout.html.twig" %}
+
+{% if entity.id  %}
+    {% set pagetitle= 'Editar datos de  '~entity.nombreCompleto%}
+    {% set urlupdate=path('socio_update', { 'id': entity.id }) %}
+{% else %}
+    {% set pagetitle= 'Alta de Nuevo Socio' %}
+    {% set urlupdate=path('socio_create') %}
+{%endif%}
+{% block contentheader %}
+<h1> Socios </h1>
+{% endblock %}
+
+{% block content %}
+    <div class='row'>
+        <div class='col-md-12'>
+            <div class='box box-solid box-primary'>
+                <div class='box-header'>
+                    <h3 class='box-title'> {{pagetitle}}  </h3>
+                    <div class="box-tools pull-right">
+                        <a href="{{ path('socio_ctacte', { 'id': entity.id }) }}" class="btn btn-primary" style="font-size:20px;padding:0 12px " title="Ver Estado de Deuda" data-toggle="tooltip"><i class="fa fa-list-alt"></i></a>
+                        <a href="{{ path('socio_abm') }}" class="btn btn-primary btn-sm cancelar"  title="Volver" data-toggle="tooltip"><i class="fa fa-close"></i></a>
+                    </div>
+                </div><!-- /.box-header -->
+                <form action="{{urlupdate }}" method="post" role="form" {{ form_enctype(form) }}>
+                    <div class='box-body pad'>
+                        {% include "AdminBundle::form-notification.html.twig" %}
+                        <fieldset>                            
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    {{ form_row(form.nombre, { 'attr': {'class' : 'form-control','style':'text-transform:uppercase' } }) }}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    {{ form_row(form.apellido, { 'attr': {'class' : 'form-control','style':'text-transform:uppercase' } }) }}
+                                </div>
+                            </div>   
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    {{ form_row(form.nroDocumento, { 'attr': {'class' : 'form-control' } }) }}
+                                </div>
+                            </div>
+                            <div class="form-group col-md-2">
+                                {{ form_label(form.fechaNacimiento) }}
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    {{ form_widget(form.fechaNacimiento, { 'attr': {'class' : 'form-control datepicker pasada' } }) }}
+                                </div><!-- /.input group -->
+                                {{ form_errors(form.fechaNacimiento) }}
+                            </div>                                                            
+                        </fieldset>                    
+                                                  
+                        <fieldset>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form_row(form.direccion, { 'attr': {'class' : 'form-control' } }) }}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    {{ form_row(form.localidad, { 'attr': {'class' : 'chosen form-control' } }) }}
+                                </div>
+                            </div>
+  
+                            <div class="col-md-1 pull-right">
+                                <div class="form-group">
+                                    {{ form_row(form.activo, { 'attr': {'class' : 'form-control' } }) }}
+                                </div>
+                            </div>                                
+                                
+                        </fieldset>
+                        <fieldset>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    {{ form_row(form.telefono, { 'attr': {'class' : 'form-control' } }) }}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    {{ form_row(form.celular, { 'attr': {'class' : 'form-control' } }) }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    {{ form_row(form.email, { 'attr': {'class' : 'form-control' } }) }}
+                                </div>
+                            </div>                                                         
+                        </fieldset>
+                        <fieldset> 
+                            <div class="col-md-10">
+                                <div class="form-group">
+                                    {{ form_row(form.empresas, { 'attr': {'class' : 'chosen form-control',
+                                        'data-placeholder' : 'Seleccionar...','multiple' : 'multiple' } }) }}
+                                </div>
+                            </div> 
+                                
+                         </fieldset>                           
+                        <br>
+                                                                 
+                    </div>
+                    <div class="box-footer">
+                        {% if entity.id and 'socio-abm-delete' in app.user.perfil.permisos %}
+                            <a type="button" class="btn btn-app delete" href="javascript:void(0)"><i class="fa fa-trash-o"></i> Eliminar</a>
+                        {%endif%}
+                        <div class="btn-group pull-right">
+                            <button type="submit" class="btn btn-app"><i class="fa fa-save"></i> Guardar</button>
+                            {% if not entity.id  %}
+                                <button type="submit" class="btn btn-app" id="savenew"><i class="fa fa-save"></i> Guardar y Nuevo</button>
+                            {%endif%}
+                            <a type="button" class="btn btn-app" href="{{ path('socio_abm')}}"><i class="fa fa-reply"></i> Cancelar</a>
+                        </div>
+                    </div>
+                    <div style="display:block">{{ form_rest(form) }}</div>
+                </form>
+                {% if entity.id and 'socio-abm-delete' in app.user.perfil.permisos %}
+                    {{ form(delete_form) }}
+                {%endif%}
+            </div><!-- /.box -->
+        </div><!-- /.col-->
+    </div><!-- ./row -->
+{% endblock %}
+{% block page_javascript %}
+<script type="text/javascript">
+$(document).ready(function() {
+    $(".chosen").chosen();
+   // Get the container who holds the collection
+    $('.collectionHolder').find('.form-actions').each(function() {
+         addItemFormDeleteLink($(this));         
+    });
+    $('.linkAdd').on('click', function(e) {
+        e.preventDefault();
+        holder = $(this).closest('.row').siblings('.collectionHolder');
+        addNewItem(holder);
+    });            
+});
+// funciones personalizas para el formulario
+function addNewItem($collectionHolder) {
+    var prototype = $collectionHolder.data('prototype');
+    var index = $collectionHolder.data('index');
+    var newForm = prototype.replace(/itemform/g, index);
+    $collectionHolder.append(newForm);
+    $collectionHolder.data('index', index + 1);
+    addItemFormDeleteLink($collectionHolder.find('.form-actions').last());    
+    $(".chosen").chosen();
+}
+ 
+function addItemFormDeleteLink($itemForm) {
+    var $removeFormA = $('<button data-toggle="tooltip" class="btn-inlist" title="Eliminar" type="button"><i class="fa fa-trash-o"></i></button>');
+    $itemForm.append($removeFormA);
+    $removeFormA.on('click', function(e) {
+        if ( confirm('Desea eliminar este item?') ) {
+            e.preventDefault();
+            $itemForm.parent().remove();
+        }
+    });
+}
+</script>
+{%endblock %}

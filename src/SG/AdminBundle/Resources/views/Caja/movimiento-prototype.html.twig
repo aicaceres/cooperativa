@@ -1,0 +1,10 @@
+<tr class="td">
+    <td class="ordTd"></td>
+    <td data-id="{{ item.vars.id }}">
+        {% if entity.tipo=='I' or entity.tipo=='L' %}<div class="hidden">{{ form_widget(item.deuda, { 'attr': {'class' : 'deuda' } })}}</div>{% endif %}
+        {{ form_widget(item.concepto, { 'attr': {'class' : 'form-control conceptocaja' } }) }}
+    </td>
+    <td>{{ form_widget(item.descripcion, { 'attr': {'class' : 'form-control' } }) }}{{form_widget(item.orden)}} </td>
+    <td>{{ form_widget(item.importe, { 'attr': {'class' : 'form-control alignright importe' } }) }}</td>
+    <td class="link-actions"> </td>
+</tr>

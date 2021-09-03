@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="application/vnd.ms-excel; charset=UTF-8" />
+   </head>
+   <body  >  
+<style>
+.align-center{text-align: center}
+table{ font-family:'Arial';font-size: 12px; }
+table tr th{
+    border-top: 1px solid gray;
+    border-left: 1px solid gray;
+    background: #CCCCCC;
+    font-size: 13px;
+    }
+table tr td{
+    border: 1px solid black;
+}
+</style>       
+      <h2 text-align="center"> Estado de Deuda</h2>              
+        <h4><strong>Apellido y Nombre:</strong> {{ socio.nombreCompleto}} - <strong>D.N.I. N°:</strong> {{ socio.nroDocumento }} </h4>
+        <div height="10px"></div>
+        
+        <table cellspacing="0">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Fecha</th>                
+                    <th>Concepto</th>                
+                    <th>Vto</th>                
+                    <th>Importe</th>                
+                    <th>Interés</th>
+                    <th>Total</th>                
+                    <th>Pago</th>                
+                    <th>Saldo</th>    
+                    <th>Descripcion</th>    
+                </tr>                        
+            </thead>
+            <tbody>
+                {% set importe,interes,total, saldoVencido = 0,0,0,0 %}
+                {% for deuda in socio.deudas if deuda.concepto.tipo!='L' %}        
+                    {% if (vencido=='true' and deuda.vencido) or vencido=='false'  %} 
+                    {% set importe,interes,total = importe+deuda.monto , interes+deuda.mora, total+deuda.saldo %}      
+                    {% if deuda.vencido %}  {% set saldoVencido = saldoVencido + deuda.saldo %} {% endif %}               
+                    
+                    <tr>
+                        <td height="20px" vertical-align="middle" text-align="right" padding-right="10px">{{loop.index}}</td>
+                        <td height="20px" vertical-align="middle" padding-left="5px">{{deuda.created|date('d-m-Y')}}</td>
+                        <td height="20px" vertical-align="middle" padding-left="5px">{{deuda.concepto~' - '~deuda.descripcion}}</td>
+                        <td height="20px" vertical-align="middle" padding-left="5px" {% if deuda.vencido %} color="red" {% endif %}>{{deuda.fechaVto|date('d-m-Y')}}</td>
+                        <td height="20px" vertical-align="middle" padding-left="5px">{{deuda.monto|number_format(2,'.',',')}}</td>
+                        <td height="20px" vertical-align="middle" padding-left="5px">{{deuda.mora|number_format(2,'.',',')}}</td>
+                        <td height="20px" vertical-align="middle" padding-left="5px">{{ (deuda.monto+deuda.mora)|number_format(2,'.',',')}}</td>                                    
+                        <td height="20px" vertical-align="middle" padding-left="5px" {% if deuda.vencido %} color="red" {% endif %} > {%if deuda.ultimoPago %}{{deuda.ultimoPago|date('d-m-Y')}}{% endif %}</td>                                    
+                        <td height="20px" vertical-align="middle" padding-left="5px" {% if deuda.vencido %} color="red" {% endif %} > <strong>{{deuda.saldo|number_format(2,'.',',')}}</strong></td>                                    
+                    </tr>                            
+                    {% endif %}
+                {% endfor %}
+            
+                <tr>
+                    <td colspan="4" height="20px" border.type="none"></td>
+                    <td colspan="2" text-align="right">
+                        <strong>Total Adeudado:</strong>
+                    </td>
+                    <td padding-right="7px" text-align="right">
+                        <strong>{{total|number_format(2,'.',',')}}</strong>
+                    </td>                    
+                    <td text-align="right">
+                        <strong>Vencido:</strong>
+                    </td>
+                    <td padding-right="10px" text-align="right" {% if saldoVencido>0 %} color="red" {% endif %} >
+                        <strong>{{saldoVencido|number_format(2,'.',',')}}</strong>
+                    </td>                    
+                </tr>     
+            </tbody>    
+        </table>    
+
+   </body>
+</html>

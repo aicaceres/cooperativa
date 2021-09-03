@@ -1,0 +1,130 @@
+<div class="table-responsive">
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th class="nosort">Fecha</th>
+                <th class="nosort">Concepto</th>
+                <th class="nosort">Vencimiento</th>
+                <th class="nosort">Importe</th>
+                <th class="nosort">Interés</th>
+                <th class="nosort">Total</th>
+                <th class="nosort">SALDO</th>
+                <th class="nosort" style="width:15%">Monto a pagar</th>
+                <th class="nosort" style="width:5%"></th>
+            </tr>
+        </thead>
+        <tbody>            
+            {% for deuda in socio.deudas if deuda.saldo>0 and deuda.concepto.tipo !='L' %}  
+                <tr class="odd gradeX">
+                    <td>{{ deuda.created|date('d-m-Y') }}</td>
+                    <td>{{ deuda.deudaTxt }}</td>
+                    <td {% if deuda.vencido %} class="red" {% endif %} >{{ deuda.fechaVto|date('d-m-Y') }}</td>
+                    <td class="alignright">{{ deuda.monto|number_format(2,'.',',') }}</td>
+                    <td class="alignright">{{ deuda.mora|number_format(2,'.',',') }}</td>
+                    <td class="alignright">{{ (deuda.monto+deuda.mora)|number_format(2,'.',',') }}</td>
+                    <td class="alignright total {% if deuda.vencido %} red {% endif %}">
+                        {{deuda.saldo|number_format(2,'.',',')}}
+                    </td>
+                    <td><input disabled="disabled" type="text" class="form-control alignright monto-a-pagar" ></input></td>
+                    <td>
+                        <input type="checkbox" name="chkcuota" class="chkcuota" data-id="{{deuda.id}}" data-concepto="{{deuda.concepto.id}}" data-txt="{{deuda.deudaTxt}}">
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="7" class="alignright">Total a Pagar</th>
+                <th class="alignright" id="total">0.00</th>
+            </tr>
+        </tfoot>
+            
+    </table>
+</div>
+        
+<div class="modal-footer" style="padding:10px 20px 0px;">
+        <div class="btn-group pull-right">
+            <button type="button" class="btn btn-primary" id="addNewItem"><i class="fa fa-check"></i> Aceptar</button>
+            <button type="button" class="btn btn-default" id="cancelModal"><i class="fa fa-reply"></i> Cancelar</button>
+        </div>
+    </div>        
+<script type="text/javascript">
+$(document).ready(function() {    
+    $('.chkcuota').change( function(){
+        var pagar =  $(this).closest('tr').find('.monto-a-pagar');
+        if( $(this).is(':checked') ){            
+            pagar.attr('disabled',false);
+            var auxi = parseFloat( $(this).parent().siblings('.total').text().replace(',','') );
+            pagar.val( auxi.toFixed(2) );
+        }else{
+            pagar.val('');
+            pagar.attr('disabled',true);
+        }
+        actualizarTotalDeuda();
+    } );
+    $('.monto-a-pagar').on('change',function(){
+        actualizarTotalDeuda();
+    })
+    $('#cancelModal').on('click',function(){        
+        $('#socio-modal').modal('hide');
+    });
+    $('#addNewItem').on('click',function(){
+        var cantidad = $('.chkcuota:checked').length;
+        var holder = $('.collectionHolder');
+       // $('#sg_adminbundle_cajamovimiento_responsablePago').val( $('#socioAutocomplete').val() );        
+        if(cantidad>0){
+            var saldo = 0;
+            $('.chkcuota:checked').each(function( index ) {
+                saldo = parseFloat($('#sg_adminbundle_cajamovimiento_total').val()) ;                
+                var id = $(this).data('id');
+                var txt = $(this).data('txt');
+                var concepto = $(this).data('concepto');                
+                var monto = parseFloat( $(this).closest('tr').find('.monto-a-pagar').val() );
+                
+                // verificar que ese item no esté cargado y si existe actualizar el valor
+                var exist = false;
+                holder.find('tr').each(function(){                     
+                    if( parseInt($(this).find('[id$="_deuda"]').val()) == parseInt(id) ){
+                        exist = true;                        
+                       return false;      
+                    }                                      
+                });        
+                // controlar que el saldo alcance para cancelar el item                
+                if ( saldo-monto <= 0){
+                    alert('La suma de los items seleccionados supera el monto a liquidar.');
+                    return false;
+                }
+                // si existe no continuar
+                if( exist ) return false;  
+
+                // crear nuevos tr
+                addNewItem( holder );
+                var item = holder.find('.td').last();
+                item.find('[id$="_importe"]').prop('readonly',true);
+                item.find('[id$="_concepto"] option').each(function () {
+                    if ( $(this).val() != concepto ) {
+                        $(this).remove();
+                    }
+                });
+                //item.find('[id$="_concepto"]').val(concepto);                              
+                item.find('[id$="_deuda"]').val( id );
+                item.find('[id$="_importe"]').val( monto.toFixed(2) );
+                item.find('[id$="_importe"]').css('background-color','antiquewhite' );
+                //item.find('[id$="_saldo"]').val( monto );
+                item.find('[id$="_descripcion"]').val( 'Pago de '+txt );                
+                actualizaTotales();                                                
+            });   
+        } 
+        $('#socio-modal').modal('hide');
+    });
+});
+
+function actualizarTotalDeuda(){
+    var totalfinal = 0;
+    $('.chkcuota:checked').each(function( index ) {
+        var total = $(this).closest('tr').find('.monto-a-pagar').val();              
+        totalfinal =  totalfinal + parseFloat(total) ;        
+    });
+    $('#total').text(totalfinal.toFixed(2));
+}
+</script>

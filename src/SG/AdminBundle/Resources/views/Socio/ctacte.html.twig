@@ -1,0 +1,258 @@
+{% extends "AdminBundle::layout.html.twig" %}
+
+{% block contentheader %}
+<h1> Socios</h1>
+{% endblock %}
+
+{% block content %}
+    {% include "AdminBundle::notification.html.twig" %}
+<div class='row'>
+    <div class='col-md-12'>
+        <div class='box box-solid box-primary'>
+            <div class='box-header'>
+                <h3 class='box-title'><i class="fa fa-list-alt"></i> &nbsp;Estado de Deuda</h3>
+            </div><!-- /.box-header -->
+            <div class='box-body'>
+                <form action="#" method="post" role="form">
+                    <fieldset>
+                        <div class="form-group col-xs-6">
+                            <div class="input-group">
+                                <span class="input-group-addon"><strong>SOCIO:</strong></span>
+                                <input name="_socio" url="{{ path('socio_suggest') }}" type="text" class="form-control" 
+                                       value="{% if socio %}{{socio.nombreCompleto}} (DNI {{socio.nroDocumento}}) {% endif %}" id="socioAutocomplete" placeholder="Seleccionar..."/>  
+                                <input type="hidden" name="_socioId" value="{% if socio %}{{socio.id}} {% endif %}" id="socioId" />                    
+                            </div>                
+                        </div>
+                        <div class="form-group col-xs-1">
+                            <button type="button" class="limpiar" data-toggle="tooltip" title="Limpiar los datos / Buscar otro Socio"><i class="fa fa-refresh"></i></button>
+                        </div>
+                        <div class="form-group col-xs-2">
+                            <span class="vencidos" ><strong>Vencidos:</strong><input type="checkbox" name="vencidos" id="vencidos" /></span> 
+                        </div>
+                        <div class="form-group col-xs-3">
+                            {%if 'socio-ctacte-new' in app.user.perfil.permisos %}
+                            <button type="button" id="nueva_deuda" class="btn btn-xs btn-warning pull-right" data-toggle="tooltip" title="Cargar nuevo Concepto.">&nbsp;Cargar Concepto</button>    
+                            <button type="button" id="nueva_cuota" class="btn btn-xs btn-warning pull-right" data-toggle="tooltip" title="Generar Cuotas.">&nbsp;Generar Cuotas</button>    
+                            {% endif %}
+                        </div>    
+                    </fieldset>                
+                </form>        
+                <!-- DATOS CUENTA CORRIENTE  -->                        
+                <div id="datosCtaCte">
+                    
+                </div>
+                <br>                
+            </div>
+        </div><!-- /.box -->
+    </div><!-- /.col-->
+</div><!-- ./row -->
+
+<!-- DEUDA/CONCEPTO -->
+<div id="deuda-modal" data-tipo="" class="modal modal-wide fade" role="dialog" aria-labelledby="deuda-modal" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog" style="width: 40%;">
+        <div class="modal-content">
+            <div class="modal-header" style="padding:10px 15px;">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title"><i class="fa fa-angle-double-right"></i> &nbsp; <span id="modalTitle"></span></h4>
+            </div>
+            <div class="modal-body" style="overflow-y: auto; padding:0 3px;">
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->    
+
+{% endblock %}
+{% block page_javascript %}
+<script src="{{ asset('assets/js/tables.js') }}" type="text/javascript"></script>
+<script type="text/javascript">
+var vencido = $('#vencidos').prop("checked");
+$(document).ready(function () {
+    
+    if (isEmpty($('#socioId').val())){
+        $(".vencidos").hide();
+        $('#nueva_deuda').hide();
+        $('#nueva_cuota').hide();
+        $('#datosCtaCte').hide();
+    }else{
+        mostrarDatos();
+    }
+        
+    $('body').on('ifChecked', "#vencidos",function(event){ 
+        vencido =true;
+         mostrarDatos();
+    });
+    $('body').on('ifUnchecked',"#vencidos", function(event){ 
+        vencido =false;
+         mostrarDatos();
+    });
+        
+        
+    $('.limpiar').on('click', function () {
+        $('#socioAutocomplete').val('');
+        $('#socioId').val('');
+        $('#datosCtaCte').hide();
+        $('#listCtacte').html('');
+        $(".vencidos").hide();
+        $('#nueva_deuda').hide(); 
+        $('#nueva_cuota').hide(); 
+        $('.socioId').val('');
+        $('#socioAutocomplete').focus();        
+    });   
+    $("#socioAutocomplete").change(function () {
+        if (isEmpty($(this).val()))
+            $("#socioId").val('');            
+    });
+    $('#socioAutocomplete').autocomplete({
+        minLength: 2,
+        source: $('#socioAutocomplete').attr('url'),
+        search: function (event, ui) {
+            $("#socioId").val('');
+        },
+        select: function (event, ui) {
+            $("#socioId").val(ui.item.id);
+            mostrarDatos();
+        }
+    });    
+    
+    $('#nueva_deuda').on('click',function(){ 
+        $('#deuda-modal').data('tipo','deuda');
+        $('#modalTitle').html('Cargar Nuevo Concepto');        
+        $('#deuda-modal').modal('show'); 
+    });
+    $('#nueva_cuota').on('click',function(){ 
+        $('#deuda-modal').data('tipo','cuota');
+        $('#modalTitle').html('Generar Cuotas');        
+        $('#deuda-modal').modal('show'); 
+    });
+    
+    $("#deuda-modal").on("show.bs.modal", function (e) {
+        if( $('#deudaForm').length ){
+            return false;
+        }
+        var socioId = $('#socioId').val();
+        var tipo = $(this).data('tipo');
+        var url = '{{path('socio_ctacte_newdeuda')}}';                 
+        $.ajax({
+            url: url,
+            data: { socioId: socioId, tipo: tipo },
+            dataType: 'json',
+            success: function(data){
+               $("#deuda-modal").find('.modal-body').html(data);
+            },
+            error: function(data) {
+                alert(data);
+            }
+        });               
+    });
+    $("#deuda-modal").on("hide.bs.modal", function () {
+        $(this).find('.modal-body').html('');
+    });
+        
+    // SHOW DEUDA
+    $('body').on('click','.deuda-show-modal',function(e) {
+        var urlbase =  $(this).data('url');  
+        var title = 'Deuda #'+$(this).data('idx');
+        var size = eModal.size.sm;        
+        eModal.setModalOptions({
+            backdrop: 'static',
+            keyboard: false
+        });
+        var options = {
+            url: urlbase,          
+            size: size,
+            title: title,
+            buttons: [               
+                {text: 'Cerrar', style: 'danger', close: true }
+            ]
+       };
+       eModal.ajax(options); 
+    });        
+        
+    /// DEL DEUDA
+    $('body').on('click','.btn-del-deuda',function(){
+        var form = $(this).closest('form');
+        var url = form.attr('action');
+        var row = $(this).closest('tr');        
+        $.ajax({
+            url: url, 
+            type: 'POST',
+            data: form.serialize(),
+            success: function(data){
+                if( data === 'OK'){
+                    row.remove();
+                    alert('Se ha eliminado el concepto.');    
+                    mostrarDatos();
+                }               
+            },
+            error: function(data) {
+                alert(data);
+            }
+        });   
+    });
+        
+});      
+function mostrarDatos(){        
+    $.get('{{ path('socio_datosCtaCte') }}', { socioId: $('#socioId').val(), estado: vencido }, function (data) {
+            $('#datosCtaCte').html(data);  
+            $(".vencidos").show();
+            $('#nueva_deuda').show(); 
+            $('#nueva_cuota').show(); 
+            $('#datosCtaCte').fadeIn();
+            ctacte = $('#tabledeuda').dataTable({
+                "bAutoWidth": false,
+                "iDisplayLength": 25,
+                "aaSorting": [[ 3, "asc" ]],
+                "columnDefs": [ {
+                    "targets"  : 'nosort',
+                    "orderable": false
+                  }],
+                "oLanguage": {
+                    "oPaginate": {
+                        "sFirst": "<<",
+                        "sNext": "Siguiente",
+                        "sLast": ">>",
+                        "sPrevious": "Previo"
+                    },
+                    "sLengthMenu": "Mostrar _MENU_ registros ",
+                    "sZeroRecords": "Sin datos",
+                    "sInfo": " _START_ / _END_  -  <strong>Total: _TOTAL_ </strong>",
+                    "sInfoEmpty": "Sin coincidencias",
+                    "sInfoFiltered": "(filtrado de _MAX_ registros)",
+                    "sSearch": "Buscar:"
+                },
+                "fnFooterCallback": function(row, data, start, end, display) {
+                    var intVal = function ( i ) {
+                        return typeof i === 'string' ?
+                            i.replace(/[\$,]/g, '')*1 :
+                            typeof i === 'number' ?
+                                i : 0;
+                    };     
+                    var formatNumber = function (num) {
+                        return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
+                    }       
+                    /* Calculate the market share for browsers on this page */
+                    importe=0; interes=0; total=0;
+                    for ( var i=0 ; i<end ; i++ )
+                    {
+                        importe += intVal(data[ display[i] ][4]) ;
+                        interes += intVal(data[ display[i] ][5]) ;
+                        total += intVal(data[ display[i] ][6]) ;
+                    }
+
+                    /* Modify the footer row to match what we want */
+                    var nCells = row.getElementsByTagName('th');
+                    importe = parseInt(importe.toFixed(2) * 100)/100;
+                    nCells[1].innerHTML =  formatNumber( importe.toFixed(2) );
+                    interes = parseInt( interes.toFixed(2) * 100)/100;
+                    nCells[2].innerHTML = formatNumber( interes.toFixed(2) );
+                    total = parseInt( total.toFixed(2) * 100)/100;
+                    nCells[3].innerHTML = formatNumber( total.toFixed(2) );
+                    //total =  parseInt(  intVal( data[ display[end-1] ][6] ) * 100)/100;
+                    //nCells[3].innerHTML =  formatNumber( total.toFixed(2) ) ;
+                    }
+            });   
+            //ctacte.fnPageChange('last');
+        }, "json");    
+}
+</script>
+{% endblock %}

@@ -1,0 +1,522 @@
+<?php
+namespace SG\AdminBundle\Entity;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
+/**
+ * SG\AdminBundle\Entity\Agenda
+ * @ORM\Table(name="agenda")
+ * @ORM\Entity(repositoryClass="SG\AdminBundle\Entity\AgendaRepository")
+ * @UniqueEntity(
+ *     fields={"fecha_inicio","medico_id"},
+ *     errorPath="fecha_inicio",
+ *     message="Ya existe un turno otorgado a este medico en este horario."
+ * )
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)  
+ */
+
+class Agenda
+{
+    /**
+     * @var integer $id
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    protected $id;
+    
+    /**
+     * @ORM\Column(name="fecha_inicio", type="datetime")
+     */
+    protected $fechaInicio;
+    
+    /**
+     * @ORM\Column(name="fecha_fin", type="datetime")
+     */
+    protected $fechaFin;
+    
+    /**
+     * @var string $cancelado
+     *
+     * @ORM\Column(name="cancelado", type="datetime", nullable=true)
+     */
+    protected $cancelado;    
+
+    /**
+     * @ORM\Column(name="atendido", type="boolean", nullable=true)
+     */
+    protected $atendido;
+    
+    /**
+     * @ORM\Column(name="nombre_paciente", type="string", length=100, nullable=true)
+     */
+    protected $nombrePaciente;
+    
+    /**
+     * @ORM\Column(name="telefono_paciente", type="string", length=100, nullable=true)
+     */
+    protected $telefonoPaciente;    
+    
+    /**
+     * @ORM\Column(name="observaciones", type="text", nullable=true)
+     */
+    protected $observaciones;
+    
+    /**
+    * @ORM\ManyToOne(targetEntity="SG\AdminBundle\Entity\Paciente", inversedBy="consultas")
+    * @ORM\JoinColumn(name="paciente_id", referencedColumnName="id")
+    */
+    protected $paciente;
+
+    /**
+    * @ORM\ManyToOne(targetEntity="SG\ConfigBundle\Entity\TipoConsulta")
+    * @ORM\JoinColumn(name="tipo_consulta_id", referencedColumnName="id")
+    */
+    protected $tipoConsulta;
+    
+    /**
+    * @ORM\ManyToOne(targetEntity="SG\ConfigBundle\Entity\Equipo")
+    * @ORM\JoinColumn(name="equipo_id", referencedColumnName="id")
+    */
+    protected $equipo;    
+
+    /**
+    * @ORM\ManyToOne(targetEntity="SG\AdminBundle\Entity\Medico")
+    * @ORM\JoinColumn(name="medico_id", referencedColumnName="id")
+    */
+    protected $medico;
+
+    /**
+    * @ORM\ManyToOne(targetEntity="SG\ConfigBundle\Entity\Sucursal")
+    * @ORM\JoinColumn(name="sucursal_id", referencedColumnName="id")
+    */
+    protected $sucursal;
+
+    /**
+     * @var datetime $created
+     * @Gedmo\Timestampable(on="create")
+     * @ORM\Column(type="datetime")
+     */
+    private $created;
+    /**
+     * @var User $createdBy
+     * @Gedmo\Blameable(on="create")
+     * @ORM\ManyToOne(targetEntity="SG\ConfigBundle\Entity\Usuario")
+     * @ORM\JoinColumn(name="created_by", referencedColumnName="id")
+     */
+    private $createdBy;
+
+    /**
+     * @var datetime $updated
+     * @Gedmo\Timestampable(on="update")
+     * @ORM\Column(type="datetime")
+     */
+    private $updated;
+
+    /**
+     * @var User $updatedBy
+     * @Gedmo\Blameable(on="update")
+     * @ORM\ManyToOne(targetEntity="SG\ConfigBundle\Entity\Usuario")
+     * @ORM\JoinColumn(name="updated_by", referencedColumnName="id")
+     */
+    private $updatedBy;  
+    
+    /**
+     * @ORM\Column(name="deletedAt", type="datetime", nullable=true)
+     */
+    private $deletedAt;      
+
+    public function __toString() {
+       return $this->getFechaInicio()->format('d-m-Y');
+    }
+    /**
+     * Get id
+     *
+     * @return integer 
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set fechaInicio
+     *
+     * @param \DateTime $fechaInicio
+     * @return Agenda
+     */
+    public function setFechaInicio($fechaInicio)
+    {
+        $this->fechaInicio = $fechaInicio;
+
+        return $this;
+    }
+
+    /**
+     * Get fechaInicio
+     *
+     * @return \DateTime 
+     */
+    public function getFechaInicio()
+    {
+        return $this->fechaInicio;
+    }
+
+    /**
+     * Set fechaFin
+     *
+     * @param \DateTime $fechaFin
+     * @return Agenda
+     */
+    public function setFechaFin($fechaFin)
+    {
+        $this->fechaFin = $fechaFin;
+
+        return $this;
+    }
+
+    /**
+     * Get fechaFin
+     *
+     * @return \DateTime 
+     */
+    public function getFechaFin()
+    {
+        return $this->fechaFin;
+    }
+
+    /**
+     * Set cancelado
+     *
+     * @param \DateTime $cancelado
+     * @return Agenda
+     */
+    public function setCancelado($cancelado)
+    {
+        $this->cancelado = $cancelado;
+
+        return $this;
+    }
+
+    /**
+     * Get cancelado
+     *
+     * @return \DateTime 
+     */
+    public function getCancelado()
+    {
+        return $this->cancelado;
+    }
+
+    /**
+     * Set atendido
+     *
+     * @param boolean $atendido
+     * @return Agenda
+     */
+    public function setAtendido($atendido)
+    {
+        $this->atendido = $atendido;
+
+        return $this;
+    }
+
+    /**
+     * Get atendido
+     *
+     * @return boolean 
+     */
+    public function getAtendido()
+    {
+        return $this->atendido;
+    }
+
+    /**
+     * Set nombrePaciente
+     *
+     * @param string $nombrePaciente
+     * @return Agenda
+     */
+    public function setNombrePaciente($nombrePaciente)
+    {
+        $this->nombrePaciente = $nombrePaciente;
+
+        return $this;
+    }
+
+    /**
+     * Get nombrePaciente
+     *
+     * @return string 
+     */
+    public function getNombrePaciente()
+    {
+        return $this->nombrePaciente;
+    }
+
+    /**
+     * Set telefonoPaciente
+     *
+     * @param string $telefonoPaciente
+     * @return Agenda
+     */
+    public function setTelefonoPaciente($telefonoPaciente)
+    {
+        $this->telefonoPaciente = $telefonoPaciente;
+
+        return $this;
+    }
+
+    /**
+     * Get telefonoPaciente
+     *
+     * @return string 
+     */
+    public function getTelefonoPaciente()
+    {
+        return $this->telefonoPaciente;
+    }
+
+    /**
+     * Set observaciones
+     *
+     * @param string $observaciones
+     * @return Agenda
+     */
+    public function setObservaciones($observaciones)
+    {
+        $this->observaciones = $observaciones;
+
+        return $this;
+    }
+
+    /**
+     * Get observaciones
+     *
+     * @return string 
+     */
+    public function getObservaciones()
+    {
+        return $this->observaciones;
+    }
+
+    /**
+     * Set created
+     *
+     * @param \DateTime $created
+     * @return Agenda
+     */
+    public function setCreated($created)
+    {
+        $this->created = $created;
+
+        return $this;
+    }
+
+    /**
+     * Get created
+     *
+     * @return \DateTime 
+     */
+    public function getCreated()
+    {
+        return $this->created;
+    }
+
+    /**
+     * Set paciente
+     *
+     * @param \SG\AdminBundle\Entity\Paciente $paciente
+     * @return Agenda
+     */
+    public function setPaciente(\SG\AdminBundle\Entity\Paciente $paciente = null)
+    {
+        $this->paciente = $paciente;
+
+        return $this;
+    }
+
+    /**
+     * Get paciente
+     *
+     * @return \SG\AdminBundle\Entity\Paciente 
+     */
+    public function getPaciente()
+    {
+        return $this->paciente;
+    }
+
+    /**
+     * Set tipoConsulta
+     *
+     * @param \SG\ConfigBundle\Entity\TipoConsulta $tipoConsulta
+     * @return Agenda
+     */
+    public function setTipoConsulta(\SG\ConfigBundle\Entity\TipoConsulta $tipoConsulta = null)
+    {
+        $this->tipoConsulta = $tipoConsulta;
+
+        return $this;
+    }
+
+    /**
+     * Get tipoConsulta
+     *
+     * @return \SG\ConfigBundle\Entity\TipoConsulta 
+     */
+    public function getTipoConsulta()
+    {
+        return $this->tipoConsulta;
+    }
+
+    /**
+     * Set medico
+     *
+     * @param \SG\AdminBundle\Entity\Medico $medico
+     * @return Agenda
+     */
+    public function setMedico(\SG\AdminBundle\Entity\Medico $medico = null)
+    {
+        $this->medico = $medico;
+
+        return $this;
+    }
+
+    /**
+     * Get medico
+     *
+     * @return \SG\AdminBundle\Entity\Medico 
+     */
+    public function getMedico()
+    {
+        return $this->medico;
+    }
+
+    /**
+     * Set sucursal
+     *
+     * @param \SG\ConfigBundle\Entity\Sucursal $sucursal
+     * @return Agenda
+     */
+    public function setSucursal(\SG\ConfigBundle\Entity\Sucursal $sucursal = null)
+    {
+        $this->sucursal = $sucursal;
+
+        return $this;
+    }
+
+    /**
+     * Get sucursal
+     *
+     * @return \SG\ConfigBundle\Entity\Sucursal 
+     */
+    public function getSucursal()
+    {
+        return $this->sucursal;
+    }
+
+    /**
+     * Set createdBy
+     *
+     * @param \SG\ConfigBundle\Entity\Usuario $createdBy
+     * @return Agenda
+     */
+    public function setCreatedBy(\SG\ConfigBundle\Entity\Usuario $createdBy = null)
+    {
+        $this->createdBy = $createdBy;
+
+        return $this;
+    }
+
+    /**
+     * Get createdBy
+     *
+     * @return \SG\ConfigBundle\Entity\Usuario 
+     */
+    public function getCreatedBy()
+    {
+        return $this->createdBy;
+    }
+    /**
+     * Set deletedAt
+     *
+     * @param \DateTime $deletedAt
+     * @return Agenda
+     */
+    public function setDeletedAt($deletedAt)
+    {
+        $this->deletedAt = $deletedAt;
+
+        return $this;
+    }
+
+    /**
+     * Get deletedAt
+     *
+     * @return \DateTime 
+     */
+    public function getDeletedAt()
+    {
+        return $this->deletedAt;
+    }
+    
+    public function getNombre(){
+        if($this->getPaciente())
+              return $this->getPaciente()->getNombreCompleto();
+        else  return $this->getNombrePaciente();
+    }
+    /*
+     * Unset Paciente
+     */
+    public function unsetPaciente(){
+        unset($this->paciente);
+    } 
+
+    /**
+     * Set updated
+     *
+     * @param \DateTime $updated
+     * @return Agenda
+     */
+    public function setUpdated($updated)
+    {
+        $this->updated = $updated;
+
+        return $this;
+    }
+
+    /**
+     * Get updated
+     *
+     * @return \DateTime 
+     */
+    public function getUpdated()
+    {
+        return $this->updated;
+    }
+
+    /**
+     * Set updatedBy
+     *
+     * @param \SG\ConfigBundle\Entity\Usuario $updatedBy
+     * @return Agenda
+     */
+    public function setUpdatedBy(\SG\ConfigBundle\Entity\Usuario $updatedBy = null)
+    {
+        $this->updatedBy = $updatedBy;
+
+        return $this;
+    }
+
+    /**
+     * Get updatedBy
+     *
+     * @return \SG\ConfigBundle\Entity\Usuario 
+     */
+    public function getUpdatedBy()
+    {
+        return $this->updatedBy;
+    }
+}

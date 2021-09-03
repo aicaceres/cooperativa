@@ -1,0 +1,12 @@
+<tr class="data-{{ vehiculo.id }}" data-id="{{ vehiculo.id }}">
+    <td>{{ vehiculo.dominio }}</td>
+    <td>{{ vehiculo.marca }}</td>
+    <td>{{ vehiculo.modelo }}</td>
+    <td>{{ vehiculo.anio }}</td>
+    <td>
+        {{ vehiculo.lineasHtml|raw }}                                                                        
+    </td>
+    <td class="link-actions">
+        {% include "AdminBundle:Vehiculo:_partial_linkactions.html.twig" with {'id':vehiculo.id, 'empleado':vehiculo.empleado} %}
+    </td>
+</tr>

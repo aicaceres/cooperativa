@@ -1,0 +1,167 @@
+{% extends "AdminBundle::layout.html.twig" %}
+{% block contentheader %}
+<h1>Informe de Caja</h1>
+{% endblock %}
+
+{% block content %}
+    <div class='row'>
+        <div class='col-md-12'>
+            <div class='box box-solid box-primary'>
+                <div class='box-header'>
+                    <h3 class='box-title'><i class="fa fa-money"></i> &nbsp;Caja {{caja.nombre}}</h3>
+                </div><!-- /.box-header -->
+                <div class='box-body pad'>
+
+                    <form class="clearfix pad" action="{{path('caja_informes')}}" method="post" role="form">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <div class="input-group pull-right">
+                                    <button class="btn btn-default pull-right" id="daterange-btn">
+                                        <i class="fa fa-calendar"></i>&nbsp; Rango de fechas&nbsp;&nbsp;
+                                        <i class="fa fa-caret-down"></i>
+                                    </button>
+                                </div>
+                            </div><!-- /.form group -->
+                        </div>
+                        <div class="col-md-3 no-padding">
+                            <div class="col-md-6 no-padding">
+                            <div class="form-group">
+                                <input id="daterange_desde" name="fecha_desde" width="80px" value="{{criterio.desde|date('d-m-Y')}}" class="form-control" readonly="readonly">
+                            </div>
+                            </div>
+                            <div class="col-md-6 no-padding">
+                            <div class="form-group">
+                                <input id="daterange_hasta" name="fecha_hasta" value="{{criterio.hasta|date('d-m-Y')}}" class="form-control" readonly="readonly">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="input-group">
+                                <span class="input-group-addon">Concepto:</span>
+                                <select id="concepto" name="concepto_caja" class="form-control">
+                                    <option value="">-Todos-</option>
+                                    {% for concepto in conceptos %}
+                                        <option value="{{concepto.id}}" {% if criterio.concepto_caja == concepto.id %}selected="selected" {% endif %}  >{{concepto.nombre}}</option>
+                                    {% endfor %}
+                                </select>  
+                            </div>
+                        </div>
+                        
+                        &nbsp;
+
+                        <div class="col-md-1">
+                            <div class="form-group">
+                                <button type="submit"><i class="fa fa-search"></i></button>
+                            </div>
+                        </div>
+                        <div class="col-md-1 pull-right">
+                            <div class="form-group">
+                                <a href="javascript:void(0)" class="pull-right btn btn-default printInforme" title="Imprimir" data-toggle="tooltip"><i class="fa fa-print"></i>&nbsp;Imprimir</a>
+                            </div>
+                        </div>
+                    </form>
+
+                    <hr class="no-margin">
+                    
+                    <div class="clearfix pad">
+<div class="table-responsive">
+    <table id="tablelist" class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th class="nosort">#</th>
+                <th class="nosort">Fecha</th>
+                <th class="nosort">Hora</th>
+                <th class="nosort">Concepto</th>
+                <th class="nosort">Descripción</th>
+                <th class="nosort">Debe</th>
+                <th class="nosort">Haber</th>
+            </tr>
+        </thead>
+        <tbody>            
+            {% set debe,haber = 0,0 %}
+            {% for mov in movimientos %} 
+                <tr class="odd gradeX">                    
+                    <td>{{ loop.index }}</td>
+                    <td>{{ mov.cajaMovimiento.fecha|date('d-m-Y') }}</td>
+                    <td>{{ mov.cajaMovimiento.fecha|date('H:i') }}</td>
+                    <td>{{ mov.concepto }}</td>
+                    <td>{{ mov.descripcion }} {% if mov.cajaMovimiento.socio %} - {{ mov.cajaMovimiento.socio }} {%endif%}</td>
+                    <td class="alignright">
+                        {% if mov.cajaMovimiento.tipo=='E' %}
+                            {{ mov.importe|number_format(2,'.',',') }}
+                            {% set debe = debe + mov.importe %}
+                        {%elseif mov.cajaMovimiento.tipo == 'L' and mov.concepto.tipo=='L' %}
+                            {{ mov.importe|number_format(2,'.',',') }}
+                            {% set debe = debe + mov.importe %}
+                         {% endif %}
+                    </td>
+                    <td class="alignright">
+                        {% if mov.cajaMovimiento.tipo=='I' %}
+                            {{ mov.importe|number_format(2,'.',',') }}
+                            {% set haber = haber + mov.importe %}
+                         {%elseif mov.cajaMovimiento.tipo == 'L' and mov.concepto.tipo!='L' %}
+                            {{ mov.importe|number_format(2,'.',',') }}  
+                            {% set haber = haber + mov.importe %}
+                        {%endif%}
+                    </td>                    
+                </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="5"></th>
+                <th class="alignright">{{debe|number_format(2,'.',',')}}</th>
+                <th class="alignright">{{haber|number_format(2,'.',',')}}</th>
+            </tr>
+        </tfoot>
+            
+    </table>
+</div>
+            
+
+                    </div>
+                    
+                    
+                    
+
+                </div>        
+
+            </div><!-- /.box-->
+        </div><!-- /.col-->
+    </div><!-- ./row -->           
+
+{% endblock %}
+{% block page_javascript %}
+<!-- date-range-picker -->
+<script src="{{ asset('assets/js/daterangepicker/daterangepicker.js') }}" type="text/javascript"></script>
+<script src="{{ asset('assets/js/timepicker/bootstrap-timepicker.min.js') }}" type="text/javascript"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+    $('#daterange-btn').daterangepicker(
+        {
+            ranges: {
+                'Hoy': [moment(), moment()],
+                'Ayer': [moment().subtract('days', 1), moment().subtract('days', 1)],
+                'Últimos 7 días': [moment().subtract('days', 6), moment()],
+                'Últimos 30 días': [moment().subtract('days', 29), moment()],
+                'Este mes': [moment().startOf('month'), moment().endOf('month')]
+            },
+            opens:'right',
+            startDate: moment( '{{startDate}}','DD-MM-YYYY' ),
+            endDate: moment( '{{endDate}}','DD-MM-YYYY' )
+        },
+        function(start, end) {
+            $('#daterange_desde').val(start.format('DD-MM-YYYY'));
+            $('#daterange_hasta').val(end.format('DD-MM-YYYY'));
+        }
+    );
+    $('.printInforme').on('click',function(){
+        url = '{{ path('caja_print_informe') }}';
+        data = '?' + $('form').serialize();
+        myWindow=window.open(url+data,"_blank")
+        myWindow.focus();
+	});
+    
+});
+</script>
+{% endblock %}

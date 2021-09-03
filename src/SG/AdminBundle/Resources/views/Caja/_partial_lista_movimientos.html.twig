@@ -1,0 +1,91 @@
+<div class="box-body table-responsive">
+    <table id="tablelist" class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th class="nosort" style="width:15px">&nbsp;#</th>
+                <th class="nosort" style="width:70px">Fecha</th>
+                <th class="nosort" style="width:15px">Hora</th>
+                <th class="nosort" >Descripción</th>
+                <th class="nosort center" style="width:100px">Debe</th>
+                <th class="nosort center" style="width:100px">Haber</th>
+                <th class="nosort center" style="width:100px">Saldo</th> 
+                <th class="nosort" style="width:20px"></th>
+                <th class="nosort" style="width:85px"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set saldo,debe,haber=apertura.montoApertura,apertura.montoApertura,0 %}
+            <tr>
+                <td></td>
+                <td>{{ apertura.fechaApertura|date('d-m-Y') }}</td>
+                <td>{{ apertura.fechaApertura|date('H:i') }}</td>
+                <td>Apertura de Caja</td>
+                <td></td>
+                <td class="alignright">{{apertura.montoApertura|number_format(2,'.',',')}}</td>
+                <td class="alignright">{{apertura.montoApertura|number_format(2,'.',',')}}</td>
+                <td></td>
+                <td></td>
+            </tr>
+            {% if apertura.movimientos|length>0 %}
+            {% for movimiento in apertura.movimientos %}
+                <tr class="odd gradeX">
+                    <td>
+                        {% if movimiento.tipo == 'I' %}
+                            {% set saldo= saldo+movimiento.pago%}
+                            {# set haber= haber+movimiento.pago #}
+                            <img src="{{ asset('assets/img/in.png') }}" style="margin-top: 5px"/>
+                        {% else %}
+                            {% if movimiento.tipo == 'L' %}
+                                {% set saldo= saldo-movimiento.detalleLiquidacion.importe%}
+                                {% set saldo= saldo+movimiento.liquidacionImputaciones%}
+                                {# set debe= debe+movimiento.pago #}
+                            {% else %}    
+                                {% set saldo= saldo-movimiento.total%}
+                                {# set debe= debe+movimiento.total #}
+                            {% endif %}                                
+                            <img src="{{ asset('assets/img/out.png') }}" style="margin-top: 5px"/>                                    
+                        {% endif %}                        
+                        
+                    </td>
+                    <td>{{ movimiento.fecha|date('d-m-Y') }}</td>
+                    <td>{{ movimiento.fecha|date('H:i') }}</td>
+                    <td>
+                        {% if  movimiento.descripcion is null %} 
+                            {% if movimiento.tipo == 'E' %}
+                                Salida de Caja                                    
+                            {% else %}
+                                {{ movimiento.responsablePago }}
+                            {% endif %}
+                        {% else %}
+                            {{movimiento.descripcion}}
+                        {% endif %}
+                    </td>
+                    <td class="alignright">{% if movimiento.tipo == 'E' %} {{movimiento.total|number_format(2,'.',',')}} {% elseif  movimiento.tipo == 'L' %} {{movimiento.detalleLiquidacion.importe|number_format(2,'.',',')}}  {% endif %}</td>
+                    <td class="alignright">{% if movimiento.tipo == 'I' %}{{movimiento.pago|number_format(2,'.',',')}} {% elseif  movimiento.tipo == 'L' %} {{movimiento.liquidacionImputaciones|number_format(2,'.',',')}}  {% endif %}</td>
+                    <td class="alignright">{{saldo|number_format(2,'.',',')}}</td>
+                    <td><button type="button" class="vermas" id="{{movimiento.id}}" style="margin: 0" title="Ver detalle" ><i class="fa fa-caret-down"></i></button></td>
+                    <td>
+                        {% if apertura.fechaCierre is null and movimiento.tipo != 'L' %}
+                            <form action="{{ path('caja_movimiento_delete', { 'id': movimiento.id }) }}" method="post" class="form-delete-inlist">
+                                <input type="hidden" name="_method" value="DELETE" />
+                                {{ form_widget(deleteForms[movimiento.id]) }}
+                                <button type="button" title="Eliminar" class="borrar"><i class="fa fa-trash"></i></button>
+                            </form>    
+                        {% endif %}    
+                        <button type="button" class="comprobante" data-url="{{ path('caja_print_movimiento', { 'id': movimiento.id })  }}" style="margin: 0" title="Imprimir" ><i class="fa fa-file-text-o"></i></button>
+                    </td>
+                </tr>
+                <tr class="even" id="tr_detalle_{{movimiento.id~movimiento.tipo}}" data-tipo="{{movimiento.tipo}}">
+                    <td></td>
+                    <td colspan="7" class="datos_detalle"></td>
+                    <td></td>
+                </tr>
+            {% endfor %}
+            {% else %}
+                <tr>
+                    <th colspan="9" class="aligncenter"> -- SIN MOVIMIENTOS --</th>
+                </tr>
+            {% endif %}            
+        </tbody>
+    </table>
+</div>    

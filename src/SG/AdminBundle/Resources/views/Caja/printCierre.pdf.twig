@@ -1,0 +1,143 @@
+<pdf>
+    <dynamic-page page-size="A4" margin-left="70px" margin-right="40px" margin-top="30px">
+        <placeholders>
+            <header>
+                <div height="85px" width="100%">
+                    <table>
+                        <tr>
+                            <td border.type="none">
+                               <img ignore-error="true" src="{{logo}}" width="330px" height="70px" margin-bottom="5px"/> 
+                            </td>
+                            <td border.type="none" font-size="7px" text-align="right" vertical-align="bottom" padding-bottom="5px">
+                                <strong>Fecha y hora: </strong>{{'now'|date('d-m-Y H:i')}} 
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div border.color="#D65200" height="2px" ></div>   
+                 </div>                      
+            </header>
+            <footer>
+                <div height="30px" width="100%" text-align="right">
+                    <page-number />
+                </div>
+            </footer>
+        </placeholders>
+        
+        <div height="20px"></div>
+        <div font-size="14px" height="20px" vertical-align="top">
+            MOVIMIENTOS DE CAJA - Informe de Cierre N° {{apertura.id}}
+        </div>
+
+        <div height="20px"></div>
+
+
+        <table font-size="11px" >
+            <tr>
+                <td border.type="none"><strong>Fecha de Apertura: </strong>{{apertura.fechaApertura|date('d-m-Y H:i')}}</td>
+                <td border.type="none"><strong>Fecha de Cierre:</strong> {{apertura.fechaCierre|date('d-m-Y H:i')}}</td>
+                <td border.type="none" text-align="right">Usuario: {{apertura.createdBy}}</td>
+            </tr>
+        </table>
+        <table font-size="10px" width="30%" margin-left="5 cm" margin-top="20px">
+            <tr>
+                <td id="tdcifras" text-align="right" height="20px" border.type="none" vertical-align="middle">Monto Apertura:</td>
+                <td extends="tdcifras">{{ apertura.montoApertura|number_format(2,'.',',') }}</td>
+            </tr>
+            <tr>
+                <td extends="tdcifras">Movimientos:</td>
+                <td extends="tdcifras">{{ apertura.totalMovimientos|number_format(2,'.',',') }}</td>
+            </tr>
+            <tr>
+                <td colspan="2"><hr margin="0"></hr></td>
+            </tr>
+            <tr>
+                <td extends="tdcifras">TOTAL:</td>
+                <td extends="tdcifras">{{ (apertura.montoApertura + apertura.totalMovimientos)  |number_format(2,'.',',') }}</td>
+            </tr>
+            <tr>
+                <td extends="tdcifras">Monto en Caja:</td>
+                <td extends="tdcifras">{{ (apertura.montoCierre)  |number_format(2,'.',',') }}</td>
+            </tr>
+            <tr>
+                <td extends="tdcifras">DIFERENCIA:</td>
+                <td extends="tdcifras" {% if apertura.diferencia!=0 %} color="red" {% endif %}>{{ (apertura.diferencia)  |number_format(2,'.',',') }}</td>
+            </tr>
+        </table>
+
+        <h4 text-decoration="underline" margin-bottom="20px">Listado de Movimientos:</h4>
+
+        <table font-size="10px">
+            <tr>
+                <td id="thmov" height="20px" vertical-align="middle" text-align="center" font-style="bold"></td>
+                <td extends="thmov">Fecha</td>
+                <td extends="thmov">Hora</td>
+                <td extends="thmov">Descripción</td>
+                <td extends="thmov">Debe</td>
+                <td extends="thmov">Haber</td>
+                <td extends="thmov">Saldo</td>
+            </tr>
+            {% set saldo,debe,haber=apertura.montoApertura,apertura.montoApertura,0 %}
+            <tr> 
+                <td height="20px" vertical-align="middle" text-align="center" font-style="bold" width="20px">+</td> 
+                <td width="70px" text-align="center" vertical-align="middle">{{ apertura.fechaApertura|date('d-m-Y') }}</td>
+                <td width="70px" text-align="center" vertical-align="middle">{{ apertura.fechaApertura|date('H:i') }}</td>
+                <td vertical-align="middle" padding-left="5px">Apertura de Caja</td>
+                <td></td>
+                <td width="70px" text-align="right" vertical-align="middle" padding-right="5px">{{apertura.montoApertura|number_format(2,'.',',')}}</td>
+                <td width="70px" text-align="right" vertical-align="middle" padding-right="5px">{{apertura.montoApertura|number_format(2,'.',',')}}</td>
+            </tr> 
+            {% if apertura.movimientos|length>0 %}
+            {% for movimiento in movimientos %}
+            <tr>
+                <td height="20px" vertical-align="middle" text-align="center" font-style="bold">
+                    {% if movimiento.tipo == 'I' %}
+                        {% set saldo= saldo+movimiento.pago%}
+                        {# set haber= haber+movimiento.pago #}
+                        +
+                    {% else %}
+                        {% if movimiento.tipo == 'L' %}
+                            {% set saldo= saldo-movimiento.detalleLiquidacion.importe%}
+                            {% set saldo= saldo+movimiento.liquidacionImputaciones%}
+                            {# set debe= debe+movimiento.pago #}
+                        {% else %}    
+                            {% set saldo= saldo-movimiento.total%}
+                            {# set debe= debe+movimiento.total #}
+                        {% endif %}                                
+                        -
+                    {% endif %}    
+                      
+                </td>
+                <td text-align="center" vertical-align="middle">{{ movimiento.fecha|date('d-m-Y') }}</td>
+                <td text-align="center" vertical-align="middle">{{ movimiento.fecha|date('H:i') }}</td>
+                <td vertical-align="middle" padding-left="5px">
+                    {% if  movimiento.descripcion is null %} 
+                        {% if movimiento.tipo == 'E' %}
+                            Salida de Caja                                    
+                        {% else %}
+                            {{ movimiento.responsablePago }}
+                        {% endif %}
+                    {% else %}
+                        {{movimiento.descripcion}}
+                    {% endif %}
+                </td> 
+                <td width="70px" text-align="right" vertical-align="middle" padding-right="5px">
+                    {% if movimiento.tipo == 'E' %} {{movimiento.total|number_format(2,'.',',')}} {% elseif  movimiento.tipo == 'L' %} {{movimiento.detalleLiquidacion.importe|number_format(2,'.',',')}}  {% endif %}
+                </td>
+                <td width="70px" text-align="right" vertical-align="middle" padding-right="5px">
+                    {% if movimiento.tipo == 'I' %}{{movimiento.pago|number_format(2,'.',',')}} {% elseif  movimiento.tipo == 'L' %} {{movimiento.liquidacionImputaciones|number_format(2,'.',',')}}  {% endif %}
+                </td>
+                <td width="70px" text-align="right" vertical-align="middle" padding-right="5px" {% if loop.last %} font-style="bold" background.color="#DDDDDD" {% endif %}>
+                    {{saldo|number_format(2,'.',',')}}
+                </td>
+            </tr>
+            {% endfor %} 
+            {% else %}
+                <tr>
+                    <td colspan="7" text-align="center" vertical-align="middle" height="20px"> -- SIN MOVIMIENTOS --</td>
+                </tr>
+            {% endif %}
+        </table>
+
+    </dynamic-page>
+</pdf>

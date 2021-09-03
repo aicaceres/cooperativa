@@ -1,0 +1,146 @@
+<?php
+namespace SG\ConfigBundle\Entity;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Gedmo\Mapping\Annotation as Gedmo;
+
+/**
+ * SG\ConfigBundle\Entity\ObraSocial
+ * @ORM\Table(name="obra_social")
+ * @ORM\Entity()
+ */
+class ObraSocial
+{
+    /**
+     * @var integer $id
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    protected $id;
+    /**
+     * @var string $nombre
+     * @ORM\Column(name="nombre", type="string", nullable=false)
+     * @Assert\NotBlank()
+     */
+    protected $nombre;
+    /**
+     * @var string $abreviatura
+     * @ORM\Column(name="abreviatura", type="string", nullable=true)
+     */
+    protected $abreviatura;
+
+     /**
+     * @ORM\OneToMany(targetEntity="SG\ConfigBundle\Entity\ObraSocialPlan", mappedBy="obraSocial",cascade={"persist", "remove"},orphanRemoval=true)
+     */
+    protected $planes;
+    
+    /**
+    * @ORM\ManyToOne(targetEntity="SG\ConfigBundle\Entity\Sucursal")
+    * @ORM\JoinColumn(name="sucursal_id", referencedColumnName="id")
+    */
+    protected $sucursal;    
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->planes = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    public function __toString() {
+       return $this->nombre;
+    }
+
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set nombre
+     *
+     * @param string $nombre
+     * @return ObraSocial
+     */
+    public function setNombre($nombre)
+    {
+        $this->nombre = $nombre;
+
+        return $this;
+    }
+
+    /**
+     * Get nombre
+     *
+     * @return string
+     */
+    public function getNombre()
+    {
+        return $this->nombre;
+    }
+
+    /**
+     * Set abreviatura
+     *
+     * @param string $abreviatura
+     * @return ObraSocial
+     */
+    public function setAbreviatura($abreviatura)
+    {
+        $this->abreviatura = $abreviatura;
+
+        return $this;
+    }
+
+    /**
+     * Get abreviatura
+     *
+     * @return string
+     */
+    public function getAbreviatura()
+    {
+        return $this->abreviatura;
+    }
+
+
+    /**
+     * Add planes
+     *
+     * @param \SG\ConfigBundle\Entity\ObraSocialPlan $planes
+     * @return ObraSocial
+     */
+    public function addPlan(\SG\ConfigBundle\Entity\ObraSocialPlan $planes)
+    {
+        $planes->setObraSocial($this);
+        $this->planes[] = $planes;
+
+        return $this;
+    }
+
+    /**
+     * Remove planes
+     *
+     * @param \SG\ConfigBundle\Entity\ObraSocialPlan $planes
+     */
+    public function removePlan(\SG\ConfigBundle\Entity\ObraSocialPlan $planes)
+    {
+        $this->planes->removeElement($planes);
+    }
+
+    /**
+     * Get planes
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getPlanes()
+    {
+        return $this->planes;
+    }
+}

@@ -1,0 +1,112 @@
+{% extends "AdminBundle::layout.html.twig" %}
+
+{% block contentheader %}
+    <h1> Informes</h1>
+{% endblock %}
+
+{% block content %}
+    {% include "AdminBundle::notification.html.twig" %}
+
+    <div class='row'>
+        <div class='col-md-12'>
+            <div class='box box-solid box-primary'>
+                <div class='box-header'>
+                    <h3 class='box-title'><i class="fa fa-users" style="font-size:24px"></i> &nbsp;Empleados</h3>
+                </div><!-- /.box-header -->
+                <div class='box-body pad'>
+                    <div class="clearfix">
+                        <form action="{{ path('empleado_informe') }}" id="empleado-informe" class="form-horizontal">
+                            <div class="form-group col-md-6">
+                                <label for="empresa" class="col-md-2 control-label">EMPRESA:</label>
+                                <div class="col-md-9">
+                                    <select name="empresa" id="select-empresa" class="form-control chosen">
+                                        <option value=""> Todas</option>
+                                        {% for emp in empresas %}
+                                            <option value="{{ emp.id }}" {% if empresa == emp.id %} selected {% endif %}> {{ emp.nombre }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>                                
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="socio" class="col-md-1 control-label">SOCIO:</label>
+                                <div class="col-md-9">
+                                    <select name="socio" id="select-socio" class="form-control chosen">
+                                        <option value=""> Todos</option>
+                                        {% for soc in socios %}
+                                            <option value="{{ soc.id }}" {% if socio == soc.id %} selected {% endif %}> {{ soc.nombreCompleto }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>                                
+
+                            </div>
+                        </form>
+
+                    </div>
+                    <div class="box-body table-responsive">
+                        <table id="tablelist" class="table table-bordered table-hover tablelist">
+                            <thead>
+                                <tr>                                
+                                    <th>Apellido y Nombre</th>
+                                    <th>DNI</th>                                
+                                    <th>CUIL/CUIT</th>                                
+                                    <th>Teléfonos</th>                                                                        
+                                    <th>Vehículos</th>                                                                        
+                                    <th style="width: 60px"> 
+                                        <a class="btn btn-sm btn-default" href="{{ path('empleado_print_informe',{'empresa':empresa,'socio':socio}) }}" target="_blank"><i class="fa fa-print"></i> &nbsp;Listado</a>
+                                    </th>                                                                        
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for empleado in lista %}
+                                    <tr>
+                                        <td>{{ empleado.nombreCompleto }}</td>
+                                        <td>{{ empleado.nroDocumento }}</td>
+                                        <td>{{ empleado.cuit }}</td>
+                                        <td>{{ empleado.telefonos }}</td>
+                                        <td>{{ empleado.vehiculos|length}}</td>
+                                        <td>
+                                            <button class="show-datos btn-inlist" data-url="{{path('empleado_show',{'id':empleado.id})}}" title="Datos del Empleado" ><i class="fa fa-file-text-o"></i></button>
+                                            {% if empleado.vehiculos|length>0 %}
+                                            <button class="show-datos btn-inlist" data-url="{{path('vehiculo_show', {'id':empleado.id})}}" title="Vehículos Asignado" ><i class="fa fa-car"></i></button>&nbsp;
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div><!-- /.box -->
+        </div><!-- /.col-->
+    </div><!-- ./row -->
+{% endblock %}
+{% block page_javascript %}
+    <script src="{{ asset('assets/js/tables.js') }}" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#select-empresa, #select-socio').on('change', function () {
+                $('#empleado-informe').submit();
+            });
+            $(".chosen").chosen();
+
+            $('body').on('click', '.show-datos', function (e) {
+                var urlbase = $(this).data('url');
+                var size = (~urlbase.indexOf("empleado") == 0) ? eModal.size.lg : eModal.size.sm;
+                eModal.setModalOptions({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+                var options = {
+                    url: urlbase,
+                    size: size,
+                    buttons: [
+                        {text: 'Cerrar', style: 'danger', close: true}
+                    ]
+                };
+                eModal.ajax(options);
+            });
+
+        });
+    </script>  
+{% endblock %}

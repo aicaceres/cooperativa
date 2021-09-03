@@ -1,0 +1,96 @@
+{% extends "AdminBundle::layout.html.twig" %}
+
+{% block contentheader %}
+<h1> Movimientos de Caja </h1>
+{% endblock %}
+
+{% block content %}
+    {% include "AdminBundle::notification.html.twig" %}
+
+<div class='row'>
+    <div class='col-md-12'>
+        <div class='box box-solid box-primary'>
+            <div class='box-header'>
+                <h3 class='box-title' style="width: 100% "><i class="fa fa-money"></i> &nbsp; Caja {{ apertura.caja.nombre }} &nbsp;  <span class="pull-right">[&nbsp; Abierta el: {{ apertura.fechaApertura|date('d/m/Y  H:i')}} &nbsp;]</span></h3>
+            </div><!-- /.box-header -->
+            <div class='box-body pad'>
+                <div class="clearfix">
+                    <a class="btn btn-default pull-left" href="{{path('caja_aperturacierre_cierre', { 'id': apertura.caja.id })}}" data-toggle="tooltip" title="Realizar el Cierre"> &nbsp;Cierre de Caja</a>
+                    <a class="btn btn-flat btn-warning pull-right" href="{{path('caja_movimiento_add', { 'apId': apertura.id, 'tipo':'L' })}}" data-toggle="tooltip" title="Registrar una Liquidación" style="margin: 0px 20px;"><i class="fa fa-minus-circle"></i> &nbsp;Liquidación</a>
+                    <a class="btn btn-flat btn-danger pull-right" href="{{path('caja_movimiento_add', { 'apId': apertura.id, 'tipo':'E' })}}" data-toggle="tooltip" title="Registrar un Egreso" style="margin: 0px 20px;"><i class="fa fa-minus-circle"></i> &nbsp;Egreso</a>
+                    <a class="btn btn-flat btn-success pull-right" href="{{path('caja_movimiento_add', { 'apId': apertura.id, 'tipo':'I' })}}" data-toggle="tooltip" title="Registrar un Ingreso"><i class="fa fa-plus-circle"></i> &nbsp;Ingreso</a>
+                </div>
+                <hr>
+                
+                {% include "AdminBundle:Caja:_partial_lista_movimientos.html.twig" %}                
+
+            </div>
+        </div><!-- /.box -->
+    </div><!-- /.col-->
+</div><!-- ./row -->
+{% endblock %}
+{% block page_javascript %}    
+<script type="text/javascript">  
+    $(document).ready(function(){    
+        if( "{{printurl}}" && confirm('Desea imprimir un comprobante?') ){
+            window.open( "{{printurl}}");
+        }
+        
+        $('[id*="tr_detalle_"]').hide();                
+        
+        $('.vermas').click(function(){
+            id = $(this).attr('id');
+            trDetalle = $(this).parent().parent().next();
+            tipoDetalle = trDetalle.data('tipo');            
+            if( $(this).hasClass('cerrar') ){
+                //trDetalle.find('.datos_detalle').html('');
+                $(this).removeClass('cerrar');
+                $(this).html('<i class="fa fa-caret-down"></i>');
+            }else{ 
+                if(trDetalle.find('.datos_detalle').html()==''){
+                    //traer datos
+                    $.get("{{path('caja_movimiento_getDetalle')}}", { id: id, tipo: tipoDetalle })
+                        .done(function( data ) {
+                            trDetalle.find('.datos_detalle').html(data);
+                    });        
+                }
+                $(this).addClass('cerrar');
+                $(this).html('<i class="fa fa-caret-up"></i>');
+            } 
+            trDetalle.fadeToggle("slow");
+
+        });
+        
+        $('.borrar').on('click',function(){   
+            var obj = $(this);
+            {% if not is_granted('ROLE_ADMIN') %}
+            $('#passadmin').val('');
+            $('#clave').dialog({
+                autoOpen: true,
+                resizable: false,
+                width: '200', 
+                title: 'Ingrese Clave',
+                buttons: [{text: "Aceptar", class: 'btn btn-success',
+                          click: function() {
+                              $.post("{{path('caja_clave')}}", { pass: $('#passadmin').val() })
+                                .done(function( data ) {
+                                    if(data=='SI'){
+                                        obj.parent('form').submit();
+                                    }else {
+                                        alert('Debe ingresar la clave de administrador para realizar esta operación.');  
+                                        return false;
+                                    }
+                            },'json'); 
+                              $(this).dialog("close");
+                          }}],
+
+              });
+            {% else %}  
+                if( confirm('Desea eliminar este movimiento?'))
+                    obj.parent('form').submit();
+            {% endif %}  
+        });
+        
+    });
+</script> 
+{% endblock %}

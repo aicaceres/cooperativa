@@ -1,0 +1,61 @@
+{% extends "AdminBundle::layout.html.twig" %}
+
+{% block contentheader %}
+<h1> Permisos </h1>
+{% endblock %}
+
+{% block content %}
+    {% include "AdminBundle::notification.html.twig" %}
+
+<div class='row'>
+    <div class='col-md-12'>
+        <div class='box box-solid box-success'>
+            <div class='box-header'>
+                <h3 class='box-title'><i class="fa  fa-building-o"></i> &nbsp;Administración</h3>
+            </div><!-- /.box-header -->
+            <div class='box-body pad'>
+                <div class="clearfix">
+                    <a class="btn btn-warning btn-flat pull-right" href="{{ path('seguridad_permiso_new') }}" data-toggle="tooltip" title="Agregar Nuevo"><i class="fa fa-building-o"></i> &nbsp;Agregar</a>
+                </div>
+                <div class="box-body table-responsive">
+                    <table id="tablelist" class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th class="nosort">id</th>
+                                <th>Módulo</th>
+                                <th>Item Menú</th>
+                                <th>Tag</th>
+                                <th>Texto</th>
+                                <th class="nosort">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+               {% for entity in entities %}
+                            <tr>
+                                <td>{{ entity.id }}</td>
+                                <td>{{ entity.modulo }}</td>
+                                <td>{{ entity.item }}</td>
+                                <td>{{ entity.tag }}</td>
+                                <td>{{ entity.texto }}</td>
+                                <td class="link-actions">
+                                    <a href="{{ path('seguridad_permiso_edit', { 'id': entity.id }) }}" data-toggle="tooltip" title="Editar"><i class="fa fa-edit"></i></a>&nbsp;
+                                    <form action="{{ path('seguridad_permiso_delete', { 'id': entity.id }) }}" method="post" class="form-delete-inlist">
+                                        <input type="hidden" name="_method" value="DELETE" />
+                                        {{ form_widget(deleteForms[entity.id]) }}
+                                        <button type="submit" title="Eliminar" class="btn-inlist" data-toggle="tooltip" onclick="if (!confirm('Desea eliminar este item?')) return false;"><i class="fa fa-trash-o"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+               {% endfor %}
+                        </tbody>
+                    </table> 
+                </div>
+                
+            </div>
+        </div><!-- /.box -->
+    </div><!-- /.col-->
+</div><!-- ./row -->
+{% endblock %}
+{% block page_javascript %}
+<script src="{{ asset('assets/js/tables.js') }}" type="text/javascript"></script>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends "AdminBundle::layout.html.twig" %}
+
+{% block contentheader %}
+    <h1> Socios</h1>
+{% endblock %}
+
+{% block content %}
+    {% include "AdminBundle::notification.html.twig" %}
+
+    <div class='row'>
+        <div class='col-md-12'>
+            <div class='box box-solid box-primary'>
+                <div class='box-header'>
+                    <h3 class='box-title'><i class="ion ion-person-stalker" style="font-size:24px"></i> &nbsp;Administración</h3>
+                </div><!-- /.box-header -->
+                <div class='box-body pad'>
+                    <div class="clearfix">
+                        <form action="{{ path('socio_abm') }}" id="search-empresa" class="form-horizontal">
+                            <div class="form-group">
+                                <label for="empresa" class="col-md-1 control-label">EMPRESA:</label>
+                                <div class="col-md-4">
+                                    <select name="empresa" id="select-empresa" class="form-control">
+                                        <option value=""> Todas</option>
+                                        {% for emp in empresas %}
+                                            <option value="{{ emp.id }}" {% if empresa == emp.id %} selected {% endif %}> {{ emp.nombre }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="pull-right">
+                                    {%if 'socio-abm-new' in app.user.perfil.permisos %}
+                                        <a style="margin-right:25px" class="btn btn-warning " href="{{ path('socio_abm_new') }}" data-toggle="tooltip" title="Agregar Nuevo"><i class="ion ion-person-add" style="font-size:20px"></i> &nbsp;Agregar</a>
+                                    {% endif %}
+                                </div>
+
+                            </div>
+                        </form>
+
+                    </div>
+                    <div class="box-body table-responsive">
+                        <table id="tablelist" class="table table-bordered table-hover tablelist">
+                            <thead>
+                                <tr>                                
+                                    <th>Apellido y Nombre</th>
+                                    <th>DNI</th>                                
+                                    <th>CUIT</th>                                
+                                    <th>Teléfonos</th>
+                                    <th>Activo</th>
+                                    <th>Saldo</th>
+                                    <th class="nosort" style="width: 120px"> <a class="btn btn-sm btn-default" href="{{ path('socio_print_listado',{'empresa':empresa}) }}" target="_blank"><i class="fa fa-print"></i> &nbsp;Listado</a> </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for entity in entities %}
+                                    <tr>
+                                        <td>{{ entity.nombreCompleto }}</td>
+                                        <td>{{ entity.nroDocumento }}</td>
+                                        <td>{{ entity.cuit }}</td>
+                                        <td>{{ entity.telefonos }}</td>
+                                        <td>{% if entity.activo %} <i class="fa fa-check"></i> {% else %} <i class="fa fa-close"></i> {% endif %} </td>
+                                        <td class="alignright">{{ entity.saldo|number_format(2,'.',',')}}</td>
+                                        <td class="link-actions">
+                                            {%if 'socio-abm-edit' in app.user.perfil.permisos %}
+                                                <a href="{{ path('socio_abm_edit', { 'id': entity.id }) }}" title="Editar Datos" data-toggle="tooltip"><i class="fa fa-edit"></i></a>&nbsp;
+                                                {% else %}
+                                                <a href="{{ path('socio_abm_show', { 'id': entity.id }) }}" title="Ver Datos" data-toggle="tooltip"><i class="fa fa-file-o"></i></a>&nbsp;
+                                                {% endif %}
+                                                {%if 'socio-abm-delete' in app.user.perfil.permisos %}
+                                                <form action="{{ path('socio_abm_delete', { 'id': entity.id }) }}" method="post" class="form-delete-inlist">
+                                                    <input type="hidden" name="_method" value="DELETE" />
+                                                    {{ form_widget(deleteForms[entity.id]) }}
+                                                    <button type="submit" title="Eliminar" class="btn-inlist" onclick="if (!confirm('Desea eliminar este Socio?'))
+                                                                return false;" data-toggle="tooltip"><i class="fa fa-trash-o"></i></button>
+                                                </form>
+                                            {% endif %}
+                                            &nbsp;&nbsp;<a href="{{ path('socio_ctacte', { 'id': entity.id }) }}" title="Ver Estado de Deuda" data-toggle="tooltip"><i class="fa fa-list-alt"></i></a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div><!-- /.box -->
+        </div><!-- /.col-->
+    </div><!-- ./row -->
+{% endblock %}
+{% block page_javascript %}
+    <script src="{{ asset('assets/js/tables.js') }}" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {            
+            $('#select-empresa').on('change', function () {
+                $('#search-empresa').submit();
+            });
+        });
+    </script>  
+{% endblock %}

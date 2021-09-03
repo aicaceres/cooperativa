@@ -1,0 +1,169 @@
+{% extends "AdminBundle::layout.html.twig" %}
+{% block contentheader %}
+<h1>Cierre de Caja N° {{apertura.id}}</h1>
+{% endblock %}
+
+{% block content %}
+<div class='row'>
+    <div class='col-md-12'>
+        <div class='box box-solid box-primary'>
+            <div class='box-header'>
+                <h3 class='box-title'><i class="fa fa-money"></i> &nbsp;Caja {{apertura.caja.nombre}}</h3>
+            </div><!-- /.box-header -->
+            <div class='box-body pad'>
+                <div class="box-body table-responsive">
+
+                    <form action="#">
+                        <div class='box-body pad'>
+                            {% include "AdminBundle::form-notification.html.twig" %}          
+                            <fieldset>             
+                                <div class="col-md-3">
+                                    <div class="form-group alignright">
+                                        <label>Fecha y Hora Aperturax:</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <input value="{{apertura.fechaApertura|date('d/m/Y  H:i')}}" class="form-control" disabled="disabled">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group alignright">
+                                        <label>Fecha y Hora Cierre:</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <input value="{{apertura.fechaCierre|date('d/m/Y  H:i')}}" class="form-control" disabled="disabled">
+                                    </div>
+                                </div>
+                            </fieldset>
+                                    <br>
+                            <fieldset>             
+                                <div class="col-md-3">&nbsp;</div>
+                                <div class="col-md-2">
+                                    <div class="form-group alignright">
+                                        <label>Monto Apertura:</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <input value="{{ apertura.montoApertura|number_format(2,'.',',') }}" class="form-control alignright" disabled="disabled">
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <fieldset>             
+                                <div class="col-md-3">&nbsp;</div>
+                                <div class="col-md-2">
+                                    <div class="form-group alignright">
+                                        <label>Movimientos:</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <input value="{{ apertura.totalMovimientos|number_format(2,'.',',') }}" class="form-control alignright" disabled="disabled">
+                                    </div>
+                                </div>
+                            </fieldset>
+                                    
+                            <fieldset>             
+                                <div class="col-md-3">&nbsp;</div>
+                                <div class="col-md-4">
+                                    <hr>
+                                </div>
+                            </fieldset>
+                            <fieldset>             
+                                <div class="col-md-3">&nbsp;</div>
+                                <div class="col-md-2">
+                                    <div class="form-group alignright">
+                                        <label>TOTAL:</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <input value="{{ (apertura.montoApertura + apertura.totalMovimientos)|number_format(2,'.',',') }}" class="form-control alignright" disabled="disabled">
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <fieldset>             
+                                <div class="col-md-3">&nbsp;</div>
+                                <div class="col-md-2">
+                                    <div class="form-group alignright">
+                                        <label>Monto en Caja:</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <input value="{{ apertura.montoCierre|number_format(2,'.',',') }}" class="form-control alignright" disabled="disabled">
+                                    </div>
+                                </div>
+                                <div class="col-md-5 alignright">
+                                    <a class="pull-right btn btn-default" href="{{path('caja_aperturacierre')}}" data-toggle="tooltip" title="Imprimir Informe"><i class="fa fa-reply"></i>&nbsp;&nbsp;Volver</a>
+                                    <a class="pull-right btn btn-primary" href="{{path('caja_print_cierre', { 'id': apertura.id })}}" target="_blank" style="margin-right: 10px;" ><i class="fa fa-print"></i>&nbsp;&nbsp;Imprimir</a>
+                                </div>
+                                    
+                            </fieldset>
+                            <fieldset>             
+                                <div class="col-md-3">&nbsp;</div>
+                                <div class="col-md-2">
+                                    <div class="form-group alignright">
+                                        <label>DIFERENCIA:</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <input value="{{ apertura.diferencia|number_format(2,'.',',') }}" class="form-control alignright {% if apertura.diferencia!=0 %}red{%endif%}" disabled="disabled">
+                                    </div>
+                                </div>                                    
+                            </fieldset>
+                        </div>
+                    </form>                                    
+                                    
+                    <div class="box box-warning">
+                        <div class="box-header">
+                            <h3 class="box-title">Detalle de Movimientos</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-warning btn-sm" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body no-padding">
+                            {% include "AdminBundle:Caja:_partial_lista_movimientos.html.twig" %}                       
+                        </div><!-- /.box-body -->
+                    </div><!-- /.box -->                                        
+                                    
+                </div>
+            </div>
+        </div><!-- /.box -->
+    </div><!-- /.col-->
+</div><!-- ./row -->           
+
+{% endblock %}
+{% block page_javascript %}
+<script type="text/javascript">
+$(document).ready(function(){
+    $('[id*="tr_detalle_"]').hide();
+    $('.vermas').click(function(){
+        id = $(this).attr('id');
+        trDetalle = $(this).parent().parent().next();
+        tipoDetalle = trDetalle.data('tipo');            
+        if( $(this).hasClass('cerrar') ){
+            //trDetalle.find('.datos_detalle').html('');
+            $(this).removeClass('cerrar');
+            $(this).html('<i class="fa fa-caret-down"></i>');
+        }else{ 
+            if(trDetalle.find('.datos_detalle').html()==''){
+                //traer datos
+                $.get("{{path('caja_movimiento_getDetalle')}}", { id: id, tipo: tipoDetalle })
+                    .done(function( data ) {
+                        trDetalle.find('.datos_detalle').html(data);
+                });        
+            }
+            $(this).addClass('cerrar');
+            $(this).html('<i class="fa fa-caret-up"></i>');
+        } 
+        trDetalle.fadeToggle("slow");
+
+    });       
+});
+</script>
+{% endblock %}

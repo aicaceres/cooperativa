@@ -1,0 +1,113 @@
+{% extends "AdminBundle::layout.html.twig" %}
+{% block contentheader %}
+<h1>
+    Cooperativa de Trabajo 
+</h1>
+{% endblock %}
+
+{% block content %}
+    {% include "AdminBundle::notification.html.twig" %}
+    <a href="{{ path('socio_import') }}" > Importar </a>
+<div class='row'>
+    <div class='col-md-6'>
+        <div class='box box-solid box-primary'>
+            <div class='box-header'>
+                <h3 class='box-title'><i class="ion ion-person-stalker"></i> &nbsp;Socios</h3>
+            </div><!-- /.box-header -->
+            <div class='box-body pad' style="font-size:12px;">
+
+
+    <table id="tablelist" class="table table-bordered table-hover tablelist">
+        <thead>
+            <tr>
+                <th>Nombre y Apellido</th>
+                <th>DNI</th>                
+                <th class="nosort" style="width: 60px"></th>
+            </tr>
+        </thead>
+        <tbody>            
+            {% for socio in socios %} 
+                <tr class="odd gradeX">                    
+                    <td>{{ socio.nombreCompleto }}</td>
+                    <td>{{ socio.nroDocumento }}</td>                    
+                    <td>
+                        &nbsp;
+                        {%if 'socio-abm-edit' in app.user.perfil.permisos %}
+                        <a href="{{ path('socio_abm_edit', { 'id': socio.id }) }}" title="Más Datos del Socio" data-toggle="tooltip"><i class="ion ion-person"></i></a>&nbsp;
+                        {% elseif 'socio-abm-show' in app.user.perfil.permisos %}
+                        <a href="{{ path('socio_abm_show', { 'id': socio.id }) }}" title="Más Datos del Socio" data-toggle="tooltip"><i class="ion ion-person"></i></a>&nbsp;
+                        {% endif %}
+                        &nbsp;
+                        {% if 'ctacte' in app.user.perfil.getItemMenu %}
+                        <a href="{{ path('socio_ctacte', { 'id': socio.id }) }}" title="Ver Cta. Cte." data-toggle="tooltip"><i class="fa fa-list-alt"></i></a>&nbsp;
+                        {% endif %}    
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>                    
+    </table>
+               
+                    
+                    
+                    
+                     
+            </div>
+        </div><!-- /.box -->
+    </div><!-- /.col-->
+    <div class='col-md-6'>
+        <div class='box box-solid box-primary'>
+            <div class='box-header'>
+                <h3 class='box-title'><i class="fa fa-money"></i> &nbsp;Vencimientos del Mes</h3>
+            </div><!-- /.box-header -->
+            
+            <div class='box-body pad' style="font-size:12px;">
+                <table id="tablelist2" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Concepto</th>
+                            <th>Socio</th>
+                            <th>Importe</th>
+                            <th class="nosort" style="width: 30px"></th>
+                        </tr>
+                    </thead>
+                    <tbody>            
+                        {% for deuda in vencimientos if deuda.saldo>0 and deuda.concepto.tipo!='L'  %} 
+                            <tr class="odd gradeX">        
+                                <td>{{ deuda.fechaVto|date('d-m-Y') }}</td>
+                                <td>{{ deuda.deudaTxt }}</td>
+                                <td>{{ deuda.socio.nombreCompleto }}</td>
+                                <td class="alignright">{{ deuda.saldo|number_format(2,'.',',') }}</td>
+                                <td> 
+                                    {% if 'ctacte' in app.user.perfil.getItemMenu %} 
+                                    <a href="{{ path('socio_ctacte', { 'id': deuda.socio.id }) }}" title="Ver Cta. Cte." data-toggle="tooltip"><i class="fa fa-list-alt"></i></a>&nbsp;
+                                    {% endif %} 
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>                    
+                </table> 
+
+
+
+
+
+            </div>            
+            
+            
+            
+            
+        </div><!-- /.box -->
+    </div><!-- /.col-->
+</div><!-- ./row -->     
+
+    
+    
+    
+    
+    
+    
+{% endblock %}
+{% block page_javascript %}
+<script src="{{ asset('assets/js/tables.js') }}" type="text/javascript"></script>
+{% endblock %}

@@ -1,0 +1,48 @@
+<div class="box-body table-responsive">
+    <table id="tablelist" class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th class="nosort" style="width:15px">&nbsp;#</th>
+                <th class="nosort" style="width:70px">Fecha</th>
+                <th class="nosort" style="width:15px">Hora</th>
+                <th class="nosort" >Descripción</th>
+                <th class="nosort center" style="width:100px">Monto</th>
+                <th class="nosort" style="width:20px"></th>
+                <th class="nosort" style="width:20px"></th>
+            </tr>
+        </thead>
+        <tbody>                     
+            {% if liquidaciones|length>0 %}
+                {% set total = 0 %}
+            {% for movimiento in liquidaciones %}
+                {% set total = total + movimiento.detalleLiquidacion.importe %}
+                <tr class="odd gradeX">
+                    <td> {{ loop.index }} </td>
+                    <td>{{ movimiento.fecha|date('d-m-Y') }}</td>
+                    <td>{{ movimiento.fecha|date('H:i') }}</td>
+                    <td> {{movimiento.descripcion}} </td>
+                    <td class="alignright">{{movimiento.detalleLiquidacion.importe|number_format(2,'.',',')}}  </td>                    
+                    <td><button type="button" class="vermas" id="{{movimiento.id}}" style="margin: 0" title="Ver detalle" ><i class="fa fa-caret-down"></i></button></td>                    
+                    <td><button type="button" class="comprobante" data-url="{{ path('caja_print_movimiento', { 'id': movimiento.id })  }}" style="margin: 0" title="Imprimir" ><i class="fa fa-file-text-o"></i></button></td>                    
+                </tr>
+                <tr class="even" id="tr_detalle_{{movimiento.id}}" data-tipo="{{movimiento.tipo}}">
+                    <td></td>
+                    <td colspan="5" class="datos_detalle"></td>
+                    <td></td>
+                </tr>
+            {% endfor %}
+            {% else %}
+                <tr>
+                    <th colspan="7" class="aligncenter"> -- SIN MOVIMIENTOS --</th>
+                </tr>
+            {% endif %}            
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="4" class="alignright">Total Liquidado: </th>
+                <th class="alignright">{{ total|number_format(2,'.',',') }}</th>
+                <th colspan="2"></th>
+            </tr>
+        </tfoot>
+    </table>
+</div>    

@@ -1,0 +1,41 @@
+<ul class="nav navbar-nav">
+    <!-- User Account: style can be found in dropdown.less -->
+    <li class="dropdown user user-menu">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <i class="glyphicon glyphicon-user"></i>
+            <span id="user" data-url="{{ path('admin_homepage') }}">{% if app.user %}{{ app.user.username }} {% endif %} <i class="caret"></i></span>
+        </a>
+        <ul class="dropdown-menu">
+            <!-- User image -->
+            <li class="user-header bg-black">
+                <p>
+                    <small>Usuario</small>
+                    {% if app.user %}{{ app.user.nombre }}{% endif %}
+                </p>
+            </li>
+            <!-- Menu Body
+            <li class="user-body">
+                <div class="col-xs-4 text-center">
+                    <a href="#">Followers</a>
+                </div>
+                <div class="col-xs-4 text-center"> 
+                    <a href="#">Sales</a>
+                </div>
+                <div class="col-xs-4 text-center">
+                    <a href="#">Friends</a>
+                </div>
+            </li>-->
+            <!-- Menu Footer-->
+            <li class="user-footer">
+                <div class="pull-left">
+                    {% if app.user %}
+                    <a href="{{ path('seguridad_usuario_profile', { 'id': app.user.id })}}" class="btn btn-default btn-flat">Perfil</a>
+                    {% endif %}
+                </div>
+                <div class="pull-right">
+                    <a href="{{ path('logout') }}" class="btn btn-default btn-flat">Cerrar Sesión</a>
+                </div>
+            </li>
+        </ul>
+    </li>
+</ul>

@@ -1,0 +1,7 @@
+<button class="empleado-modal btn-inlist" data-url="{{path('empleado_render_modal')}}" data-id="{{ id }}" title="Datos del Empleado" ><i class="fa fa-edit"></i></button>&nbsp;
+{%if 'empleado-abm-delete' in app.user.perfil.permisos %}
+<button class="delete-tab btn-inlist" data-url="{{path('empleado_delete', {'id':id})}}" title="Eliminar Empleado" ><i class="fa fa-trash-o"></i></button>&nbsp;
+{% endif %}
+{% if vehiculos|length>0 %}
+<button class="show-modal btn-inlist" data-url="{{path('vehiculo_show', {'id':id})}}" title="Vehículos Asignado" ><i class="fa fa-car"></i></button>&nbsp;
+{% endif %}

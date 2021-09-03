@@ -1,0 +1,18 @@
+<fieldset>
+    <div class="col-md-5">
+        <div class="form-group">
+            {{ form_row(item.direccion, { 'attr': {'class' : 'form-control' } }) }}
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            {{ form_row(item.localidad, { 'attr': {'class' : 'chosen form-control' } }) }}
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            {{ form_row(item.telefono, { 'attr': {'class' : 'form-control' } }) }}
+        </div>
+    </div>
+    <div class="form-group col-md-1 form-actions" style="margin-top: 20px;">&nbsp;</div>
+</fieldset>

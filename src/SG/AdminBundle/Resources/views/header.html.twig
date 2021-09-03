@@ -1,0 +1,23 @@
+<input type="hidden" value="{{ app.request.attributes.get('_route') }}" id="route"/>
+<!-- header logo: style can be found in header.less -->
+<header class="header">
+    <a href="{{ path('admin_homepage') }}" class="logo">
+        <!-- Add the class icon to your logo image or logo icon to add the margining 
+        <img src="{{ asset('assets/img/logos/letras.png') }}" alt="Ingreso" />-->
+        <span class="logo-lg"><b>CAMINO AL FUTURO</b></span>
+    </a>
+    <!-- Header Navbar: style can be found in header.less -->
+    <nav class="navbar navbar-static-top" role="navigation">
+        <!-- Sidebar toggle button-->
+        <a href="javascript:void(0)" class="navbar-btn sidebar-toggle" data-toggle="offcanvas"
+           role="button" title="Mostrar/Ocultar Menú">
+            <span class="sr-only">Menú de Navegación</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </a>
+        <div class="navbar-right">
+            {% include "AdminBundle::header-navbar.html.twig" %}
+        </div>
+    </nav>
+</header>

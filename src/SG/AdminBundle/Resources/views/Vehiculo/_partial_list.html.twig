@@ -1,0 +1,53 @@
+<fieldset>          
+    <div class="col-md-12">
+
+        <div class='box box-primary'>
+            <div class='box-header'>
+                <h3 class='box-title'><i class="fa fa-car"></i> &nbsp;Vehículos &nbsp&nbsp<span data-toggle="tooltip" title="Vehículos" id="vehiculos-count" class="badge bg-blue">{{ entity.vehiculos|length }}</span></h3>
+                <div class="box-tools pull-right">
+                    {%if 'vehiculo-abm-new' in app.user.perfil.permisos %}
+                    <button type="button" id="vehiculo-add" class="btn btn-warning vehiculo-modal" data-toggle="tooltip" title="Nuevo Vehículo" data-url="{{path('vehiculo_render_modal')}}" data-socio="{{ entity.id }}"> 
+                        <i class="fa fa-car"></i>&nbsp;&nbsp;Agregar
+                    </button>
+                    {% endif %}
+                </div>
+            </div><!-- /.box-header -->    
+            <div class='box-body pad'>
+
+                <div class="box-body table-responsive">
+                    <table id="table-vehiculos" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>                                
+                            <th>Dominio</th>
+                            <th>Marca</th>                                
+                            <th>Modelo</th>                                
+                            <th>Año</th>
+                            <th>Líneas</th>
+                            <th class="nosort" style="width: 120px"> <a class="hidden btn btn-sm btn-default" href="{{ path('socio_print_listado') }}" target="_blank"><i class="fa fa-print"></i> &nbsp;Listado</a> </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for vehiculo in entity.vehiculos %}
+                            <tr class="data-{{ vehiculo.id }}" data-id="{{ vehiculo.id }}">
+                                <td>{{ vehiculo.dominio }}</td>
+                                <td>{{ vehiculo.marca }}</td>
+                                <td>{{ vehiculo.modelo }}</td>
+                                <td>{{ vehiculo.anio }}</td>
+                                <td>
+                                    {{ vehiculo.lineasHtml|raw }}                                                                        
+                                </td>
+                                <td class="link-actions">
+                                    {% include "AdminBundle:Vehiculo:_partial_linkactions.html.twig" with {'id':vehiculo.id, 'empleado':vehiculo.empleado} %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>                    
+                </div>
+
+
+            </div>
+        </div>
+
+    </div>
+</fieldset> 

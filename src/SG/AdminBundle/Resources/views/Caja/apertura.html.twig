@@ -1,0 +1,65 @@
+{% extends "AdminBundle::layout.html.twig" %}
+{% block contentheader %}
+<h1>Apertura de Caja</h1>
+{% endblock %}
+
+{% block content %}
+<div class='row'>
+    <div class='col-md-12'>
+        <div class='box box-solid box-primary'>
+            <div class='box-header'>
+                <h3 class='box-title'><i class="fa fa-money"></i> &nbsp;Caja {{entity.caja.nombre}}</h3>
+            </div><!-- /.box-header -->
+            <div class='box-body pad'>
+                <div class="box-body table-responsive">
+
+                    <form action="{{path('caja_apertura_create') }}" method="post" role="form" {{ form_enctype(form) }}>
+                        <div class='box-body pad'>
+                            {% include "AdminBundle::form-notification.html.twig" %}                   
+                            <fieldset>
+                                <div class="col-md-3">
+                                    &nbsp;
+                                </div>
+                                <div class="form-group col-md-3">
+                                    {{ form_label(form.fechaApertura) }}
+                                    <div class="input-group">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                        {{ form_widget(form.fechaApertura, { 'attr': {'class' : 'form-control', 'readonly':'readonly' } }) }}
+                                    </div><!-- /.input group -->
+                                    {{ form_errors(form.fechaApertura) }}
+                                </div>
+                                <div class="form-group col-md-2">
+                                    {{ form_label(form.montoApertura) }}
+                                    <div class="input-group">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-dollar"></i>
+                                        </div>
+                                        {{ form_widget(form.montoApertura, { 'attr': {'class' : 'form-control'} }) }}
+                                    </div><!-- /.input group -->
+                                    {{ form_errors(form.montoApertura) }}
+                                </div>                            
+                            </fieldset>                                                                                         
+                        </div>
+                        <div class="box-footer">
+                            <div class="btn-group pull-right">
+                                <button type="submit" class="btn btn-app"><i class="fa fa-check"></i> Registrar Apertura</button>
+                                <a type="button" class="btn btn-app" href="{{ path('caja_aperturacierre')}}"><i class="fa fa-close"></i> Cancelar</a>
+                            </div>
+                        </div>
+                        <div style="display:none">{{ form_rest(form) }}</div>
+                    </form>                    
+                </div>
+            </div>
+        </div><!-- /.box -->
+    </div><!-- /.col-->
+</div><!-- ./row -->       
+{% endblock %}
+{% block page_javascript %}
+<script type="text/javascript">
+$(document).ready(function() {
+    $('#sg_adminbundle_cajaapertura_montoApertura').focus();
+});
+</script>
+{% endblock %}

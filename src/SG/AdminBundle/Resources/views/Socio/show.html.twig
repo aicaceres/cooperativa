@@ -1,0 +1,171 @@
+{% extends "AdminBundle::layout.html.twig" %}
+
+{% block contentheader %}
+<h1> Socios </h1>
+{% endblock %}
+
+{% block content %}
+    <div class='row'>
+        <div class='col-md-12'>
+            <div class='box box-solid box-primary'>
+                <div class='box-header'>
+                    <h3 class='box-title'> Datos de {{entity.nombreCompleto}}  </h3>
+                    <div class="box-tools pull-right">
+                        <a href="{{ path('socio_abm') }}" class="btn btn-primary btn-sm cancelar"  title="Volver" data-toggle="tooltip"><i class="fa fa-close"></i></a>
+                    </div>
+                </div><!-- /.box-header -->
+                <form action="#" method="post" role="form" >
+                    <div class='box-body pad'>
+                        {% include "AdminBundle::form-notification.html.twig" %}
+                        <fieldset>
+                            <div class="col-md-1">
+                                <div class="form-group">
+                                    {{ form_row(form.codigo, { 'attr': {'class' : 'form-control', 'disabled':'disabled' } }) }}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    {{ form_row(form.nombre, { 'attr': {'class' : 'form-control', 'disabled':'disabled' } }) }}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    {{ form_row(form.apellido, { 'attr': {'class' : 'form-control', 'disabled':'disabled'} }) }}
+                                </div>
+                            </div>   
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    {{ form_row(form.nroDocumento, { 'attr': {'class' : 'form-control', 'disabled':'disabled' } }) }}
+                                </div>
+                            </div>
+                            <div class="col-md-1 pull-right">
+                                <div class="form-group">
+                                    {{ form_row(form.activo, { 'attr': {'class' : 'form-control', 'disabled':'disabled' } }) }}
+                                </div>
+                            </div>                            
+                        </fieldset>                    
+                        <fieldset>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    {{ form_row(form.matricula, { 'attr': {'class' : 'form-control', 'disabled':'disabled' } }) }}
+                                </div>
+                            </div>
+                            <div class="form-group col-md-2">
+                                {{ form_label(form.fechaMatriculacion) }}
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    {{ form_widget(form.fechaMatriculacion, { 'attr': {'class' : 'form-control', 'disabled':'disabled' } }) }}
+                                </div><!-- /.input group -->
+                                {{ form_errors(form.fechaMatriculacion) }}
+                            </div>
+                            <div class="form-group col-md-2">
+                                {{ form_label(form.fechaHabilitacion) }}
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    {{ form_widget(form.fechaHabilitacion, { 'attr': {'class' : 'form-control', 'disabled':'disabled' } }) }}
+                                </div><!-- /.input group -->
+                                {{ form_errors(form.fechaHabilitacion) }}
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    {{ form_row(form.saldoInicial, { 'attr': {'class' : 'form-control', 'disabled':'disabled' } }) }}
+                                </div>
+                            </div>                            
+                        </fieldset>                            
+                        <fieldset>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form_row(form.direccion, { 'attr': {'class' : 'form-control', 'disabled':'disabled' } }) }}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    {{ form_row(form.localidad, { 'attr': {'class' : 'form-control', 'disabled':'disabled' } }) }}
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    {{ form_row(form.telefono, { 'attr': {'class' : 'form-control', 'disabled':'disabled' } }) }}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    {{ form_row(form.celular, { 'attr': {'class' : 'form-control', 'disabled':'disabled' } }) }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    {{ form_row(form.email, { 'attr': {'class' : 'form-control', 'disabled':'disabled' } }) }}
+                                </div>
+                            </div>                                                         
+                        </fieldset>
+                        <fieldset>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form_row(form.actividadPrincipal, { 'attr': {'class' : 'form-control', 'disabled':'disabled' } }) }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form_row(form.actividadSecundaria, { 'attr': {'class' : 'form-control', 'disabled':'disabled' } }) }}
+                                </div>
+                            </div>                               
+                        </fieldset> 
+                        <fieldset>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    {{ form_row(form.situacion, { 'attr': {'class' : 'form-control', 'disabled':'disabled' } }) }}
+                                </div>
+                            </div>                        
+                        </fieldset>                            
+                        <br>
+                        <!-- DATOS DOMICLIO -->
+                        <div class="box box-warning">
+                            <div class="box-header">
+                                <h3 class="box-title">Domicilio Laboral</h3>
+                                <div class="box-tools pull-right">
+                                    <button type="button" class="btn btn-warning btn-sm" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                </div>
+                            </div>
+                            <div class="box-body no-padding">
+                                <div >
+                                    {% for item in form.domicilios %}
+                                        <fieldset>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_row(item.direccion, { 'attr': {'class' : 'form-control', 'disabled':'disabled' } }) }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    {{ form_row(item.localidad, { 'attr': {'class' : 'form-control', 'disabled':'disabled' } }) }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    {{ form_row(item.telefono, { 'attr': {'class' : 'form-control', 'disabled':'disabled' } }) }}
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    {% endfor %}
+                                </div>                            
+                            </div><!-- /.box-body -->
+                        </div><!-- /.box -->                                           
+                    </div>
+                    <div class="box-footer">
+                        <div class="btn-group pull-right">
+                            <a type="button" class="btn btn-app" href="{{ path('socio_abm')}}"><i class="fa fa-reply"></i> Cancelar</a>
+                        </div>
+                    </div>
+                    <div style="display:none">{{ form_rest(form) }}</div>
+                </form>
+            </div><!-- /.box -->
+        </div><!-- /.col-->
+    </div><!-- ./row -->
+{% endblock %}

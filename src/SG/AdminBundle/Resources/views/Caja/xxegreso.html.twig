@@ -1,0 +1,165 @@
+{% extends "AdminBundle::layout.html.twig" %}
+
+{% block contentheader %}
+<h1> Movimiento de Caja</h1>
+{% endblock %}
+
+{% block content %}
+    {% include "AdminBundle::notification.html.twig" %}
+
+<div class='row'>
+    <div class='col-md-12'>
+        <div class='box box-solid box-primary'>
+            <div class='box-header'>
+                <h3 class='box-title' style="width: 100% "><i class="fa fa-minus-circle"></i> &nbsp;Egreso de Caja &nbsp;  <span class="pull-right">&nbsp; Fecha y Hora: {{ 'now'|date('d/m/Y  H:i')}} &nbsp;</span></h3>
+            </div><!-- /.box-header -->
+            <form action="{{path('caja_movimiento_create') }}" method="post" role="form" {{ form_enctype(form) }}>
+                <div class='box-body pad table-responsive'>
+                    {% include "AdminBundle::form-notification.html.twig" %}                   
+                    <fieldset>                                
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form_row(form.descripcion, { 'attr': {'class' : 'form-control' } }) }}
+                            </div>
+                        </div>                     
+                    </fieldset>                      
+                   
+                    <table id="tablelist" class="table table-bordered table-hover">
+                        <tbody data-index="{{form.detalles | length }}" class="collectionHolder"
+                            data-prototype="{% filter escape %}{% include 'AdminBundle:Caja:egreso-prototype.html.twig' with {'item':form.detalles.vars.prototype} %}{% endfilter %}">
+                         {{ form_errors(form.detalles) }}
+                            <tr>
+                                <th style="width: 3%">#</th>
+                                <th style="width: 32%"><i class="fa fa-list-ul"></i>   Concepto</th>
+                                <th style="width: 50%"><i class="fa fa-edit"></i> Detalle adicional</th>
+                                <th style="width: 10%"><i class="fa fa-money"></i> Importe</th>
+                                <th style="width: 5%">
+                                    <button type="button" class="linkAddMovimiento" title="Agregar"><i class="fa fa-plus"></i></button>
+                                </th>
+                            </tr>
+                         {% for item in form.detalles %}
+                             <tr>
+                                 <td class="ordTd"></td>
+                                 <td data-id="{{ item.vars.id }}">{{ form_widget(item.concepto, { 'attr': {'class' : 'form-control conceptocaja' } }) }}
+                                 </td>
+                                 <td>{{ form_widget(item.descripcion, { 'attr': {'class' : 'form-control' } }) }} </td>
+                                 <td>{{ form_widget(item.importe, { 'attr': {'class' : 'form-control alignright importe' } }) }}</td>
+                                 <td class="link-actions"> </td>
+                             </tr>
+                         {% endfor %}
+                        </tbody>
+                        <tfoot>
+                         <tr>
+                             <th colspan="3"></th>
+                             <th id="impTot" class="alignright">{{ form_widget(form.total, { 'attr': {'class' : 'form-control alignright', 'readonly':true } }) }}</th>
+                             <th></th>
+                         </tr>
+                        </tfoot>
+                    </table>
+                    
+                </div>
+                <div class="box-footer">
+                    <div class="btn-group pull-right">
+                        <button type="submit" class="btn btn-app"><i class="fa fa-check"></i> Registrar Egreso</button>
+                        <a type="button" class="btn btn-app" href="{{ path('caja_movimiento')}}"><i class="fa fa-close"></i> Cancelar</a>
+                    </div>
+                </div>
+                <div style="display:none">{{ form_rest(form) }}</div>
+            </form>    
+
+        </div><!-- /.box -->
+    </div><!-- /.col-->
+</div><!-- ./row -->
+{% endblock %}
+{% block page_javascript %}
+<script type="text/javascript">
+$(document).ready(function() {
+    $('.collectionHolder').on('change','.importe', function(){
+        actualizaTotales();
+    });
+
+    // Get the container who holds the collection
+    /*$('.collectionHolder').find('.ordTd').each(function(i) {
+        $(this).html(i + 1);
+    });*/
+        setOrder();
+    $('.collectionHolder').find('.link-actions').each(function() {
+        addItemFormDeleteLink($(this));
+    });
+    $('.linkAddMovimiento').on('click', function(e) {
+        e.preventDefault();
+        var holder = $('.collectionHolder');
+        if( holder.find('tr').length < 10 ){
+            addNewItem(holder);
+        }
+    });
+    
+    $(document).keypress(function(e) {
+        if (e.which == 43) { 
+            e.preventDefault();
+            $('.linkAddMovimiento').click();
+        }
+        if(e.keyCode == 13) { 
+            e.preventDefault();
+            return false;
+        }
+    }); 
+
+    $('form').on('submit', function(){
+        total = parseFloat($('#sg_adminbundle_cajamovimiento_total').val());
+        if( total===0 ){
+            alert('El movimiento no se puede registrar sin un importe.');
+            return false;
+        }
+    });
+
+    if('{{form.detalles | length }}'==0 )
+        $('.linkAddMovimiento').click();
+    actualizaTotales();
+    $('#sg_adminbundle_cajamovimiento_descripcion').focus();
+});
+
+function addNewItem($collectionHolder) {
+    var prototype = $collectionHolder.data('prototype');
+    var index = $collectionHolder.data('index');
+    var newForm = prototype.replace(/items/g, index);
+    $collectionHolder.append(newForm);
+
+    $collectionHolder.data('index', index + 1);
+    $collectionHolder.find('.ordTd').last().html($collectionHolder.data('index'));
+    $('#sg_adminbundle_cajamovimiento_detalles_'+index+'_orden').val(index + 1);
+    addItemFormDeleteLink( $collectionHolder.find('.link-actions').last() );
+    actualizaTotales();
+}
+
+function addItemFormDeleteLink($itemForm) {
+    var $removeFormA = $('<button type="button" title="Eliminar"><i class="fa fa-trash"></i></button>');
+    $itemForm.prepend($removeFormA);
+    $removeFormA.on('click', function(e) {
+        if ( confirm('Desea eliminar este item?') ) {
+            e.preventDefault();
+            $itemForm.parent().remove();
+            actualizaTotales();
+            setOrder();
+            $('.collectionHolder').data('index', $('.collectionHolder').find('.ordTd').length );
+        }
+    });
+}
+function setOrder(){
+    $('.collectionHolder').find('.ordTd').each(function(i) {
+        $('#sg_adminbundle_cajamovimiento_detalles_'+i+'_orden').val(i + 1);
+        $(this).html(i + 1);
+    });
+}
+function actualizaTotales(){
+    var impTot=0;
+    $('.importe').each(function(){
+        var item = $(this).val();
+        importe  = parseFloat(item);
+        importe = (isNaN(importe))?0:importe;
+        impTot += importe;
+    });
+    $('#sg_adminbundle_cajamovimiento_total').val(impTot.toFixed(2));
+    }
+</script>
+{% endblock %}

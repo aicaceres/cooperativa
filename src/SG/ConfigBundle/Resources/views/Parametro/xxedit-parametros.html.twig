@@ -1,0 +1,50 @@
+<h5> Configuración de parámetros necesarios para el uso del sistema.</h5>
+
+<form action="{{ path('configuracion_update', { 'table': 'Parametros', 'id': entity.id }) }}" method="post" role="form" {{ form_enctype(form) }}>
+    <div class='box-body pad'>
+        {% include "AdminBundle::form-notification.html.twig" %}
+        <fieldset>             
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form_label(form.diaVtoCuota) }}
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    {{ form_widget(form.diaVtoCuota, { 'attr': {'class' : 'form-control' } }) }}
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>             
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form_label(form.tipoRecargoCuota) }}
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    {{ form_widget(form.tipoRecargoCuota, { 'attr': {'class' : 'form-control' } }) }}
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>             
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form_label(form.montoRecargoCuota) }}
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    {{ form_widget(form.montoRecargoCuota, { 'attr': {'class' : 'form-control' } }) }}
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div class="box-footer">
+        <div class="btn-group pull-right">
+            <button id="save" type="submit" class="btn btn-app"><i class="fa fa-save"></i> Guardar</button>                        
+            <a type="button" href="{{ path('configuracion',{'table':'Parametros'}) }}" class="btn btn-app"><i class="fa fa-reply"></i> Cancelar</a>     
+        </div>
+    </div>
+    <div style="display:none;">{{ form_rest(form) }}</div>
+</form>   

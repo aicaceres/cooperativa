@@ -1,0 +1,10 @@
+<button class="vehiculo-modal btn-inlist" data-url="{{path('vehiculo_render_modal')}}" data-id="{{ vehiculo.id }}" title="Datos del Vehículo" ><i class="fa fa-edit"></i></button>&nbsp;
+{%if 'vehiculo-abm-delete' in app.user.perfil.permisos %}
+<button class="delete-tab btn-inlist" data-url="{{path('vehiculo_delete', {'id':vehiculo.id})}}" title="Eliminar Vehículo" ><i class="fa fa-trash-o"></i></button>&nbsp;
+{% endif %}
+{% if vehiculo.empleado %}
+<button class="show-modal btn-inlist" data-url="{{path('empleado_show', {'id':vehiculo.empleado.id})}}" title="Asignado a: {{ vehiculo.empleado.nombreCompleto }}" ><i class="fa fa-user"></i></button>&nbsp;
+{% endif %}
+{% if vehiculo.asignadoAlSocio %}
+<i style="color:#444; font-size: 20px" title="Asignado al Socio" class="ion ion-person"></i>
+{% endif %}

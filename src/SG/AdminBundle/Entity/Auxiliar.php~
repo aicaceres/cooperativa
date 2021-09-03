@@ -1,0 +1,80 @@
+<?php
+
+namespace SG\AdminBundle\Entity;
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * SG\AdminBundle\Entity\Auxiliar
+ * @ORM\Table(name="auxiliar")
+ * @ORM\Entity()
+ */
+class Auxiliar {
+    /**
+     * @var integer $id
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    protected $id;
+
+    /**
+     * @ORM\Column(name="nombre", type="string", nullable=true)
+     */
+    protected $nombre;
+
+    /**
+     * @ORM\Column(name="apellido", type="string", nullable=true)
+     */
+    protected $apellido;
+
+    /**
+     * @ORM\Column(name="dni", type="string", nullable=true)
+     */
+    protected $dni;
+
+    /**
+     * @ORM\Column(name="cuit", type="string", nullable=true)
+     */
+    protected $cuit;
+
+    /**
+     * @ORM\Column(name="fechanac", type="string", nullable=true)
+     */
+    protected $fechanac;
+
+    /**
+     * @ORM\Column(name="direccion", type="string", nullable=true)
+     */
+    protected $direccion;
+
+    /**
+     * @ORM\Column(name="localidad", type="string", nullable=true)
+     */
+    protected $localidad;
+
+    /**
+     * @ORM\Column(name="telefono", type="string", nullable=true)
+     */
+    protected $telefono;
+
+    /**
+     * @ORM\Column(name="celular", type="string", nullable=true)
+     */
+    protected $celular;
+
+    /**
+     * @ORM\Column(name="email", type="string", nullable=true)
+     */
+    protected $email;
+
+    /**
+     * @ORM\Column(name="contacto", type="string", nullable=true)
+     */
+    protected $contacto;
+
+    /**
+     * @ORM\Column(name="empresas", type="string", nullable=true)
+     */
+    protected $empresas;
+
+}
